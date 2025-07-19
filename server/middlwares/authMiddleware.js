@@ -11,9 +11,12 @@ module.exports = (req, res, next) => {
       });
     }
 
-    const token = authHeader.split(" ")[1]; // ✅ Correct: split by space
+    const token = authHeader.split(" ")[1];
     const decryptedToken = jwt.verify(token, process.env.JWT_SECRET);
-    req.body.userId = decryptedToken.userId;
+
+    // ✅ Store in req.userId instead of req.body (which is undefined in GET requests)
+    req.userId = decryptedToken.userId;
+
     next();
   } catch (error) {
     res.status(401).send({
