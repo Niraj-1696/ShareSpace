@@ -23,11 +23,9 @@ export const GetCurrentUser = async () => {
     });
     return response.data;
   } catch (error) {
-    return (
-      error.response?.data || {
-        success: false,
-        message: "Something went wrong",
-      }
-    );
+    return {
+      success: false,
+      message: error.response?.data?.message || "Something went wrong",
+    };
   }
 };
