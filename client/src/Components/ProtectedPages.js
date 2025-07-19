@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { message } from "antd";
 import { GetCurrentUser } from "../apicalls/users";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Setloader } from "../Redux/loadersSlice";
+import { SetUser } from "../Redux/usersSlice";
 
 function ProtectedPages({ children }) {
-  const [user, setUser] = useState(null);
+  const { user } = useSelector((state) => state.users);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const validateToken = async () => {
@@ -15,7 +16,7 @@ function ProtectedPages({ children }) {
       const response = await GetCurrentUser();
       dispatch(Setloader(false));
       if (response && response.success) {
-        setUser(response.data);
+        dispatch(SetUser(response.data));
       } else {
         message.error(response.message || "Unauthorized access");
         localStorage.removeItem("token");
@@ -46,7 +47,10 @@ function ProtectedPages({ children }) {
 
           <div className="bg-white py-2 px-5 rounded flex gap-1 items-center">
             <i className="ri-shield-user-line"></i>
-            <span className="underline cursor-pointer uppercase">
+            <span
+              className="underline cursor-pointer uppercase"
+              onClick={() => navigate("/profile")}
+            >
               {user.name}
             </span>
             <i
