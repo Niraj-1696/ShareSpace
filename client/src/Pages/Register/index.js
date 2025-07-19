@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { Form, Input, Button, Divider, App as AntdApp } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { RegisterUser } from "../../apicalls/users.js";
-
+import { useDispatch } from "react-redux";
+import { Setloader } from "../../Redux/loadersSlice";
 const rules = [
   {
     required: true,
@@ -11,17 +12,22 @@ const rules = [
 ];
 
 function Register() {
-  const { message } = AntdApp.useApp(); // ✅ use AntD context-safe message
+  const { message } = AntdApp.useApp();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const onFinish = async (values) => {
     try {
+      dispatch(Setloader(true));
       const response = await RegisterUser(values);
+      navigate("/login");
+      dispatch(Setloader(false));
       if (response.success) {
         message.success(response.message);
       } else {
         throw new Error(response.message);
       }
     } catch (error) {
+      dispatch(Setloader(false));
       message.error(error.message);
     }
   };

@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { Form, Input, Button, Divider, App as AntdApp } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { LoginUser } from "../../apicalls/users";
-
+import { useDispatch } from "react-redux";
+import { Setloader } from "../../Redux/loadersSlice";
 const rules = [
   {
     required: true,
@@ -13,9 +14,12 @@ const rules = [
 function Login() {
   const { message } = AntdApp.useApp(); // ✅ Correct now
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const onFinish = async (values) => {
     try {
+      dispatch(Setloader(true));
       const response = await LoginUser(values);
+      dispatch(Setloader(false));
       if (response.success) {
         message.success(response.message);
         localStorage.setItem("token", response.data);
@@ -24,6 +28,7 @@ function Login() {
         throw new Error(response.message);
       }
     } catch (error) {
+      dispatch(Setloader(false));
       message.error(error.message);
     }
   };

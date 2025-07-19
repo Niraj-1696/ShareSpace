@@ -3,12 +3,14 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { ConfigProvider, App as AntdApp } from "antd"; // ✅ Add App alias
+import { ConfigProvider, App as AntdApp } from "antd";
+import { Provider } from "react-redux";
+import store from "./Redux/store";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-  <React.StrictMode>
+  <Provider store={store}>
     <ConfigProvider
       theme={{
         components: {
@@ -28,7 +30,7 @@ root.render(
         <App />
       </AntdApp>
     </ConfigProvider>
-  </React.StrictMode>
+  </Provider>
 );
 
 reportWebVitals();

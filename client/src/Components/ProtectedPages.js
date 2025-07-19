@@ -2,14 +2,18 @@ import React, { useEffect, useState } from "react";
 import { message } from "antd";
 import { GetCurrentUser } from "../apicalls/users";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Setloader } from "../Redux/loadersSlice";
 
 function ProtectedPages({ children }) {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const validateToken = async () => {
     try {
+      dispatch(Setloader(true));
       const response = await GetCurrentUser();
+      dispatch(Setloader(false));
       if (response && response.success) {
         setUser(response.data);
       } else {
@@ -18,6 +22,7 @@ function ProtectedPages({ children }) {
         navigate("/login");
       }
     } catch (error) {
+      dispatch(Setloader(false));
       message.error("Token validation failed");
       localStorage.removeItem("token");
       navigate("/login");
@@ -33,14 +38,31 @@ function ProtectedPages({ children }) {
   }, []);
 
   return (
-    <div>
-      {user && (
-        <div className="p-5">
-          <div>{user.name}</div>
-          {children}
+    user && (
+      <div>
+        {/* header */}
+        <div className="flex justify-between items-center bg-primary p-5">
+          <h1 className="text-2xl text-white">ShareSpace</h1>
+
+          <div className="bg-white py-2 px-5 rounded flex gap-1 items-center">
+            <i className="ri-shield-user-line"></i>
+            <span className="underline cursor-pointer uppercase">
+              {user.name}
+            </span>
+            <i
+              className="ri-logout-box-r-line ml-10"
+              onClick={() => {
+                localStorage.removeItem("token");
+                navigate("/login");
+              }}
+            ></i>
+          </div>
         </div>
-      )}
-    </div>
+
+        {/* body */}
+        <div className="p-5">{children}</div>
+      </div>
+    )
   );
 }
 
