@@ -36,7 +36,7 @@ function ProtectedPages({ children }) {
     <div>
       {user && (
         <div className="p-5">
-          <div>Welcome, {user.name}</div>
+          <div>{user.name}</div>
           {children}
         </div>
       )}

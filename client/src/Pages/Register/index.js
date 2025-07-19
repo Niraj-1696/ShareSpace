@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Form, Input, Button, Divider, App as AntdApp } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { RegisterUser } from "../../apicalls/users.js";
 
 const rules = [
@@ -12,7 +12,7 @@ const rules = [
 
 function Register() {
   const { message } = AntdApp.useApp(); // ✅ use AntD context-safe message
-
+  const navigate = useNavigate();
   const onFinish = async (values) => {
     try {
       const response = await RegisterUser(values);
@@ -25,6 +25,12 @@ function Register() {
       message.error(error.message);
     }
   };
+
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      navigate("/");
+    }
+  }, [navigate]);
 
   return (
     <div className="h-screen bg-primary flex justify-center items-center">
