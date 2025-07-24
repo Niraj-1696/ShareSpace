@@ -34,8 +34,6 @@ router.post("/add-product", authMiddleware, async (req, res) => {
       seller: req.userId, // ✅ hard-coded last
     });
 
-    console.log("🧪 Final payload before save:", newProduct);
-
     await newProduct.save();
 
     res.send({
