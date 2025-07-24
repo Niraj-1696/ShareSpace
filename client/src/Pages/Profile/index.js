@@ -1,12 +1,13 @@
 import React from "react";
 import { Tabs } from "antd";
+import Products from "./Products";
 
 function Profile() {
   return (
     <div>
       <Tabs defaultActiveKey="1">
-        <Tabs.TabPane tab="Buy / Sell" key="1">
-          <h1>Buy / Sell</h1>
+        <Tabs.TabPane tab="Products" key="1">
+          <Products />
         </Tabs.TabPane>
         <Tabs.TabPane tab="Bids" key="2">
           <h1>Bids</h1>
