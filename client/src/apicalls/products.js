@@ -1,11 +1,11 @@
 import { axiosInstance } from "./axiosinstance";
 
 // add a new product
-export const AddProduct = async (payload) => {
+export const AddProduct = async (productData) => {
   try {
     const response = await axiosInstance.post(
       "/api/products/add-product",
-      payload
+      productData
     );
     return response.data;
   } catch (error) {

@@ -5,11 +5,37 @@ const authMiddleware = require("../middlwares/authMiddleware");
 // ✅ Add a new product
 router.post("/add-product", authMiddleware, async (req, res) => {
   try {
-    // `authMiddleware` sets req.user to the userId (string)
-    req.body.seller = req.user;
-    req.body.status = "pending"; // default status
+    const {
+      name,
+      description,
+      price,
+      category,
+      age,
+      images,
+      billAvailable,
+      warrentyAvailable,
+      accessoriesAvailable,
+      boxAvailable,
+      status,
+    } = req.body;
 
-    const newProduct = new Product(req.body);
+    const newProduct = new Product({
+      name,
+      description,
+      price,
+      category,
+      age,
+      images,
+      billAvailable,
+      warrentyAvailable,
+      accessoriesAvailable,
+      boxAvailable,
+      status,
+      seller: req.userId, // ✅ hard-coded last
+    });
+
+    console.log("🧪 Final payload before save:", newProduct);
+
     await newProduct.save();
 
     res.send({
