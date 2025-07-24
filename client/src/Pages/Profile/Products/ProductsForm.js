@@ -1,51 +1,140 @@
 import React from "react";
-import { Modal, Tabs, Form } from "antd";
+import {
+  Modal,
+  Tabs,
+  Form,
+  Row,
+  Col,
+  message,
+  Checkbox,
+  Input,
+  Select,
+} from "antd";
 import TextArea from "antd/es/input/TextArea";
-import Input from "antd/es/input/Input";
+import { useDispatch, useSelector } from "react-redux";
+import { AddProduct } from "../../../apicalls/products";
+import { Setloader } from "../../../Redux/loadersSlice";
+
+const { Option } = Select;
+
+const additionalThings = [
+  { Label: "Bill Available", name: "billAvailable" },
+  { Label: "Warrenty Available", name: "warrentyAvailable" },
+  { Label: "Accessories Available", name: "accessoriesAvailable" },
+  { Label: "Box Available", name: "boxAvailable" },
+];
+
+const rules = [{ required: true, message: "Required!" }];
 
 function ProductsForm({ showProductForm, setShowProductForm }) {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.users);
+  const formRef = React.useRef(null);
+
+  const onFinish = async (values) => {
+    try {
+      values.seller = user._id;
+      values.status = "pending";
+      values.images = []; // temp - should come from upload logic later
+      dispatch(Setloader(true));
+      const response = await AddProduct(values);
+      dispatch(Setloader(false));
+      if (response.success) {
+        message.success(response.message);
+        setShowProductForm(false);
+      } else {
+        message.error(response.message);
+      }
+    } catch (error) {
+      dispatch(Setloader(false));
+      message.error(error.message);
+    }
+  };
+
   return (
     <Modal
-      tittle=""
+      title="Add Product"
       open={showProductForm}
       onCancel={() => setShowProductForm(false)}
       centered
       width={1000}
+      okText="Save"
+      onOk={() => formRef.current.submit()}
     >
-      <Tabs>
-        <Tabs.TabPane tab="General" key="1">
-          <Form layout="vertical">
-            <Form.Item label="Name" name="name">
-              <Input type="text" />
-            </Form.Item>
-            <Form.Item label="Description" name="description">
-              <TextArea type="text" />
-            </Form.Item>
+      <Form layout="vertical" ref={formRef} onFinish={onFinish}>
+        <Tabs
+          defaultActiveKey="1"
+          items={[
+            {
+              key: "1",
+              label: "General",
+              children: (
+                <>
+                  <Form.Item label="Name" name="name" rules={rules}>
+                    <Input />
+                  </Form.Item>
 
-            <Row>
-              <Col span={8}>
-                <Form.Item label="Price" name="price">
-                  <Input type="number" />
-                </Form.Item>
-              </Col>
+                  <Form.Item
+                    label="Description"
+                    name="description"
+                    rules={rules}
+                  >
+                    <TextArea />
+                  </Form.Item>
 
-              <Col span={8}>
-                <Form.Item label="Category" name="category">
-                  <select>
-                    <option value="electronics">Electronics</option>
-                    <option value="fashion">Fashion</option>
-                    <option value="home">Home</option>
-                    <option value="sports">Sports</option>
-                  </select>
-                </Form.Item>
-              </Col>
-            </Row>
-          </Form>
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="Images" key="2">
-          <h1>Images</h1>
-        </Tabs.TabPane>
-      </Tabs>
+                  <Row gutter={16}>
+                    <Col span={8}>
+                      <Form.Item label="Price" name="price" rules={rules}>
+                        <Input type="number" />
+                      </Form.Item>
+                    </Col>
+
+                    <Col span={8}>
+                      <Form.Item label="Category" name="category" rules={rules}>
+                        <Select placeholder="Select Category">
+                          <Option value="electronics">Electronics</Option>
+                          <Option value="fashion">Fashion</Option>
+                          <Option value="home">Home</Option>
+                          <Option value="sports">Sports</Option>
+                        </Select>
+                      </Form.Item>
+                    </Col>
+
+                    <Col span={8}>
+                      <Form.Item label="Age" name="age" rules={rules}>
+                        <Input type="number" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+
+                  <div className="flex gap-10">
+                    {additionalThings.map((item) => (
+                      <Form.Item
+                        key={item.name}
+                        name={item.name}
+                        valuePropName="checked"
+                        noStyle
+                      >
+                        <Checkbox>{item.Label}</Checkbox>
+                      </Form.Item>
+                    ))}
+                  </div>
+
+                  {/* Hidden field for images until upload works */}
+                  <Form.Item name="images" initialValue={[]} hidden>
+                    <Input />
+                  </Form.Item>
+                </>
+              ),
+            },
+            {
+              key: "2",
+              label: "Images",
+              children: <h1>Image Upload Coming Soon</h1>,
+            },
+          ]}
+        />
+      </Form>
     </Modal>
   );
 }
