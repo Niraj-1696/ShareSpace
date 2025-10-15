@@ -1,5 +1,8 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
+
+app.use(cors()); // ✅ Add this line
 app.use(express.json());
 require("dotenv").config();
 const dbconfig = require("./config/dbconfig");
@@ -10,6 +13,7 @@ const productsRoute = require("./routes/productsRoute");
 
 app.use("/api/users", usersRoute);
 app.use("/api/products", productsRoute);
+
 app.listen(port, () =>
-  console.log(`Node/Express Server started on port ${port}`)
+  console.log(`✅ Server running on http://localhost:${port}`)
 );
