@@ -6,6 +6,7 @@ import { Setloader } from "../../../Redux/loadersSlice";
 import { useDispatch } from "react-redux";
 
 function Products() {
+  const [selectedProduct, setSelectedProduct] = React.useState(null);
   const [products, setProducts] = React.useState([]);
   const [showProductForm, setShowProductForm] = React.useState(false);
   const dispatch = useDispatch();
@@ -55,7 +56,13 @@ function Products() {
         return (
           <div className="flex gap-5">
             <i className="ri-delete-bin-line"></i>
-            <i className="ri-pencil-line"></i>
+            <i
+              className="ri-pencil-line"
+              onClick={() => {
+                setSelectedProduct(record);
+                setShowProductForm(true);
+              }}
+            ></i>
           </div>
         );
       },
@@ -78,6 +85,8 @@ function Products() {
         <ProductsForm
           showProductForm={showProductForm}
           setShowProductForm={setShowProductForm}
+          selectedProduct={selectedProduct}
+          getData={getData}
         />
       )}
     </div>

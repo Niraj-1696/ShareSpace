@@ -11,5 +11,5 @@ const productsRoute = require("./routes/productsRoute");
 app.use("/api/users", usersRoute);
 app.use("/api/products", productsRoute);
 app.listen(port, () =>
-  console.log("Node/Express Server started on port $(port)")
+  console.log(`Node/Express Server started on port ${port}`)
 );
