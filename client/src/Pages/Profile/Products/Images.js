@@ -2,17 +2,39 @@ import { Button, message, Upload } from "antd";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { Setloader } from "../../../Redux/loadersSlice";
+import { UploadProductImage } from "../../../apicalls/products";
 
 function Images({ selectedProduct, setShowProductForm, getData }) {
+  const [images = [], setimages] = React.useState(selectedProduct.images);
   const [file, setFile] = React.useState(null);
   const dispatch = useDispatch();
-  const upload = () => {
+
+  const upload = async () => {
+    if (!file) return message.error("Please select a file");
+
     try {
       dispatch(Setloader(true));
+
+      // Convert to raw File if AntD wraps it
+      const rawFile = file.originFileObj || file;
+
+      const formData = new FormData();
+      formData.append("file", rawFile);
+      formData.append("productId", selectedProduct._id);
+
+      const response = await UploadProductImage(formData);
+
+      if (response.success) {
+        message.success(response.message);
+        getData();
+        setFile(null); // clear file
+      } else {
+        message.error(response.message || "Upload failed");
+      }
     } catch (error) {
-      // Upload Image to Cloudinary
+      message.error(error.message || "Upload failed");
+    } finally {
       dispatch(Setloader(false));
-      message.error(error.message);
     }
   };
 
@@ -20,26 +42,28 @@ function Images({ selectedProduct, setShowProductForm, getData }) {
     <div>
       <Upload
         listType="picture"
-        beforeUpload={() => false}
-        onChange={(info) => {
-          setFile(info.file);
-        }}
+        beforeUpload={() => false} // prevent auto upload
+        onChange={(info) => setFile(info.file)}
       >
-        <Button type="dashed">Upload Image</Button>
+        <div className="flex gap-5 mb-5">
+          {images.map((image) => {
+            return (
+              <div className="flex gap-2 border border-solid border-gray-500 rounded p-5 items-end">
+                <img className="h-20 w-20 object-cover" src={image} alt="" />
+                <i className="ri-delete-bin-line" onClick={() => {}}></i>
+              </div>
+            );
+          })}
+        </div>
+        <Button type="dashed">Select Image</Button>
       </Upload>
 
       <div className="flex justify-end gap-5 mt-5">
-        <Button
-          type="default"
-          onClick={() => {
-            setShowProductForm(false);
-          }}
-        >
+        <Button type="default" onClick={() => setShowProductForm(false)}>
           Cancel
         </Button>
-
         <Button type="primary" disabled={!file} onClick={upload}>
-          Upload
+          {file ? "Upload" : "Select File"}
         </Button>
       </div>
     </div>

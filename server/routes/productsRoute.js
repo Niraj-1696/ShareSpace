@@ -1,10 +1,29 @@
 const router = require("express").Router();
 const Product = require("../models/productModel");
 const authMiddleware = require("../middlwares/authMiddleware");
-const { cloudinary_js_config } = require("../config/cloudinaryConfig");
+const cloudinary = require("../config/cloudinaryConfig");
 const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
 
-// ✅ Add a new product
+// Ensure uploads folder exists
+const uploadDir = path.join(__dirname, "../uploads");
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
+
+// Multer setup
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+const upload = multer({ storage });
+
+// -------------------- Product Routes -------------------- //
+
+// Add a new product
 router.post("/add-product", authMiddleware, async (req, res) => {
   try {
     const {
@@ -33,98 +52,104 @@ router.post("/add-product", authMiddleware, async (req, res) => {
       accessoriesAvailable,
       boxAvailable,
       status,
-      seller: req.userId, // ✅ hard-coded last
+      seller: req.userId,
     });
 
     await newProduct.save();
 
-    res.send({
+    res.status(200).json({
       success: true,
       message: "Product added successfully",
     });
   } catch (error) {
     console.error("❌ Error adding product:", error);
-    res.status(500).send({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
-// ✅ Get all products
+// Get all products
 router.get("/get-products", async (req, res) => {
   try {
     const products = await Product.find().sort({ createdAt: -1, _id: -1 });
-    res.send({
-      success: true,
-      products,
-    });
+    res.status(200).json({ success: true, products });
   } catch (error) {
     console.error("❌ Error fetching products:", error);
-    res.status(500).send({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
-// edit a product
+// Edit a product
 router.put("/edit-product/:id", authMiddleware, async (req, res) => {
   try {
     await Product.findByIdAndUpdate(req.params.id, req.body);
-    res.send({
-      success: true,
-      message: "Product updated successfully",
-    });
+    res
+      .status(200)
+      .json({ success: true, message: "Product updated successfully" });
   } catch (error) {
-    res.send({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
-// delete a product
+// Delete a product
 router.delete("/delete-product/:id", authMiddleware, async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
-    res.send({
-      success: true,
-      message: "Product deleted successfully",
-    });
+    res
+      .status(200)
+      .json({ success: true, message: "Product deleted successfully" });
   } catch (error) {
-    res.send({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
-// get image from pc
-const storage = multer.diskStorage({
-  filename: function (req, file, callback) {
-    callback(null, Date.now() + file.originalname);
-  },
-});
-
+// Upload image to product
 router.post(
   "/upload-image-to-product",
   authMiddleware,
-  multer({ storage: storage }).single("file"),
+  upload.single("file"),
   async (req, res) => {
     try {
-      // upload image to cloudinary
-      const result = await cloudinary.uploader.upload(req.file.path);
-      const productId = req.body.probuctId;
-      await Product.findByIdAndUpdate(productId, {
+      if (!req.file)
+        return res
+          .status(400)
+          .json({ success: false, message: "No file uploaded" });
+      if (!req.body.productId)
+        return res
+          .status(400)
+          .json({ success: false, message: "Missing productId" });
+
+      const filePath = path.resolve(req.file.path);
+      console.log("Uploading file to Cloudinary:", filePath);
+
+      let result;
+      try {
+        result = await cloudinary.uploader.upload(filePath, {
+          folder: "ShareSpace",
+        });
+      } catch (err) {
+        console.error("Cloudinary upload failed:", err);
+        return res.status(500).json({
+          success: false,
+          message: "Cloudinary upload failed",
+          error: err.message,
+        });
+      }
+
+      await Product.findByIdAndUpdate(req.body.productId, {
         $push: { images: result.secure_url },
       });
-      res.send({
+
+      fs.unlinkSync(filePath); // delete temp file
+
+      res.status(200).json({
         success: true,
         message: "Image uploaded successfully",
-        result,
+        imageUrl: result.secure_url,
       });
-    } catch (error) {}
+    } catch (err) {
+      console.error("Image upload route error:", err);
+      res.status(500).json({ success: false, message: err.message });
+    }
   }
 );
 
