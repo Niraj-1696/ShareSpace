@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import Images from "./Images"; // ✅ make sure Images has default export
 import {
   Modal,
   Tabs,
@@ -32,6 +33,10 @@ function ProductsForm({
   selectedProduct,
   getData,
 }) {
+  // ❌ Your previous state declaration was incorrect
+  // ✅ Correct useState syntax:
+  const [selectedTab, setSelectedTab] = React.useState("1");
+
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.users);
   const formRef = React.useRef(null);
@@ -47,7 +52,7 @@ function ProductsForm({
       } else {
         values.seller = user._id;
         values.status = "pending";
-        values.images = []; // placeholder until upload implemented
+        values.images = [];
         response = await AddProduct(values);
       }
 
@@ -55,8 +60,9 @@ function ProductsForm({
 
       if (response.success) {
         message.success(response.message);
-        setShowProductForm(false);
-        getData(); // refresh products table
+        // ✅ Optional: auto-switch to Images tab after adding
+        if (!selectedProduct) setSelectedTab("2");
+        getData();
       } else {
         message.error(response.message);
       }
@@ -84,10 +90,13 @@ function ProductsForm({
       width={1000}
       okText="Save"
       onOk={() => formRef.current.submit()}
+      {...(selectedTab === "2" && { footer: false })}
     >
       <Form layout="vertical" ref={formRef} onFinish={onFinish}>
         <Tabs
           defaultActiveKey="1"
+          activeKey={selectedTab}
+          onChange={(key) => setSelectedTab(key)} // ✅ correct function call
           items={[
             {
               key: "1",
@@ -154,7 +163,14 @@ function ProductsForm({
             {
               key: "2",
               label: "Images",
-              children: <h1>Image Upload Coming Soon</h1>,
+              disabled: !selectedProduct,
+              children: (
+                <Images
+                  selectedProduct={selectedProduct}
+                  getData={getData}
+                  setShowProductForm={setShowProductForm}
+                />
+              ),
             },
           ]}
         />
