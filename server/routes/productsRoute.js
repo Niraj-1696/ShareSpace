@@ -68,8 +68,13 @@ router.post("/add-product", authMiddleware, async (req, res) => {
 });
 
 // Get all products
-router.get("/get-products", async (req, res) => {
+router.post("/get-products", async (req, res) => {
   try {
+    const { seller, categories = [], age = [] } = req.body;
+    let filters = {};
+    if (seller) {
+      filters.seller = seller;
+    }
     const products = await Product.find().sort({ createdAt: -1, _id: -1 });
     res.status(200).json({ success: true, products });
   } catch (error) {

@@ -14,9 +14,12 @@ export const AddProduct = async (productData) => {
 };
 
 // get all products
-export const GetProducts = async () => {
+export const GetProducts = async (filters) => {
   try {
-    const response = await axiosInstance.get("/api/products/get-products");
+    const response = await axiosInstance.post(
+      "/api/products/get-products",
+      filters
+    );
     return response.data;
   } catch (error) {
     return error.message;

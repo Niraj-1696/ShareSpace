@@ -3,44 +3,33 @@ import { Button, message, Table } from "antd";
 import ProductsForm from "./ProductsForm";
 import { GetProducts, DeleteProduct } from "../../../apicalls/products";
 import { Setloader } from "../../../Redux/loadersSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux"; // ✅ added useSelector import
 import moment from "moment";
 
 function Products() {
   const [selectedProduct, setSelectedProduct] = React.useState(null);
   const [products, setProducts] = React.useState([]);
   const [showProductForm, setShowProductForm] = React.useState(false);
+  const { user } = useSelector((state) => state.users);
   const dispatch = useDispatch();
 
-  // Fetch products and sort newest first
+  // ✅ Fetch products for the logged-in seller only
   const getData = async () => {
     try {
       dispatch(Setloader(true));
-      const response = await GetProducts();
+
+      // Pass seller ID to API
+      const response = await GetProducts({ seller: user._id });
+
       dispatch(Setloader(false));
+
       if (response.success) {
-        // Sort products by createdAt descending
+        // Sort newest first
         setProducts(
           response.products.sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           )
         );
-      }
-    } catch (error) {
-      dispatch(Setloader(false));
-      message.error(error.message);
-    }
-  };
-
-  // Delete product
-  const handleDeleteProduct = async (id) => {
-    try {
-      dispatch(Setloader(true));
-      const response = await DeleteProduct(id);
-      dispatch(Setloader(false));
-      if (response.success) {
-        message.success(response.message);
-        getData(); // refresh table
       } else {
         message.error(response.message);
       }
@@ -50,7 +39,25 @@ function Products() {
     }
   };
 
-  // Table columns
+  // ✅ Delete product
+  const handleDeleteProduct = async (id) => {
+    try {
+      dispatch(Setloader(true));
+      const response = await DeleteProduct(id);
+      dispatch(Setloader(false));
+      if (response.success) {
+        message.success(response.message);
+        getData(); // refresh list
+      } else {
+        message.error(response.message);
+      }
+    } catch (error) {
+      dispatch(Setloader(false));
+      message.error(error.message);
+    }
+  };
+
+  // ✅ Table columns
   const columns = [
     { title: "Name", dataIndex: "name" },
     { title: "Description", dataIndex: "description" },
@@ -85,10 +92,12 @@ function Products() {
     },
   ];
 
-  // Fetch products on mount
+  // ✅ Fetch data on mount
   useEffect(() => {
-    getData();
-  }, []);
+    if (user?._id) {
+      getData();
+    }
+  }, [user]);
 
   return (
     <div>
@@ -96,18 +105,18 @@ function Products() {
         <Button
           type="default"
           onClick={() => {
-            setSelectedProduct(null); // reset selection
+            setSelectedProduct(null);
             setShowProductForm(true);
           }}
         >
-          Add Products
+          Add Product
         </Button>
       </div>
 
       <Table
         columns={columns}
         dataSource={products}
-        rowKey={(record) => record._id} // ✅ ensures correct rendering & order
+        rowKey={(record) => record._id}
       />
 
       {showProductForm && (
@@ -115,7 +124,7 @@ function Products() {
           showProductForm={showProductForm}
           setShowProductForm={setShowProductForm}
           selectedProduct={selectedProduct}
-          getData={getData} // refresh table after add/edit
+          getData={getData}
         />
       )}
     </div>
