@@ -144,7 +144,7 @@ router.post(
       res.status(200).json({
         success: true,
         message: "Image uploaded successfully",
-        imageUrl: result.secure_url,
+        data: result.secure_url,
       });
     } catch (err) {
       console.error("Image upload route error:", err);
