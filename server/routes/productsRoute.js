@@ -75,7 +75,10 @@ router.post("/get-products", async (req, res) => {
     if (seller) {
       filters.seller = seller;
     }
-    const products = await Product.find().sort({ createdAt: -1, _id: -1 });
+    const products = await Product.find(filters).sort({
+      createdAt: -1,
+      _id: -1,
+    });
     res.status(200).json({ success: true, products });
   } catch (error) {
     console.error("❌ Error fetching products:", error);

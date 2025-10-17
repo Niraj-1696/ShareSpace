@@ -51,17 +51,23 @@ function Login() {
             <Input placeholder="Email" />
           </Form.Item>
           <Form.Item label="Password" name="password" rules={rules}>
-            <Input.Password placeholder="Password" />
+            <Input type="password" />
           </Form.Item>
 
           <Button type="primary" htmlType="submit" block className="mt-2">
             Login
           </Button>
 
+          <div className="mt-2 text-center">
+            <Link to="/forgot-password" className="text-primary">
+              Forgot Password?
+            </Link>
+          </div>
+
           <div className="mt-5 text-center">
             <span className="text-gray-500">
               Don't have an account?{" "}
-              <Link to="/Register" className="text-primary">
+              <Link to="/register" className="text-primary">
                 Register
               </Link>
             </span>
