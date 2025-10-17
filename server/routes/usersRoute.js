@@ -83,12 +83,14 @@ router.get("/get-current-user", authMiddleware, async (req, res) => {
       });
     }
 
+    // Return minimal user info including id and role so frontend can use it
     res.send({
       success: true,
       data: {
+        _id: user._id,
         name: user.name,
         email: user.email,
-        // ...anything else you want to send
+        role: user.role,
       },
     });
   } catch (error) {

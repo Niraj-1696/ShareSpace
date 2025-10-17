@@ -72,10 +72,22 @@ router.post("/get-products", async (req, res) => {
   try {
     const { seller, categories = [], age = [] } = req.body;
     let filters = {};
+    // Build filters based on request body
     if (seller) {
       filters.seller = seller;
     }
-    const products = await Product.find().sort({ createdAt: -1, _id: -1 });
+    if (categories && categories.length > 0) {
+      filters.category = { $in: categories };
+    }
+    if (age && age.length > 0) {
+      // assuming age is an array of acceptable ages
+      filters.age = { $in: age };
+    }
+
+    const products = await Product.find(filters).sort({
+      createdAt: -1,
+      _id: -1,
+    });
     res.status(200).json({ success: true, products });
   } catch (error) {
     console.error("❌ Error fetching products:", error);
