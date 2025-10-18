@@ -40,6 +40,16 @@ export const EditProduct = async (id, payload) => {
   }
 };
 
+// get product by id
+export const GetProductById = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/api/products/get-product/${id}`);
+    return response.data;
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
+
 // delete a product
 export const DeleteProduct = async (id) => {
   try {

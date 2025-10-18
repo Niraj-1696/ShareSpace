@@ -80,9 +80,25 @@ router.post("/get-products", async (req, res) => {
       createdAt: -1,
       _id: -1,
     });
-    res.status(200).json({ success: true, products });
+    res.status(200).json({ success: true, data: products });
   } catch (error) {
     console.error("❌ Error fetching products:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Get product by ID
+router.get("/get-product/:id", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id).populate("seller");
+    if (!product) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
+    }
+    res.status(200).json({ success: true, data: product });
+  } catch (error) {
+    console.error("❌ Error fetching product:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 });

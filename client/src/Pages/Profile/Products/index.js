@@ -26,7 +26,7 @@ function Products() {
       if (response.success) {
         // Sort newest first
         setProducts(
-          response.products.sort(
+          response.data.sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           )
         );
