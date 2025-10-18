@@ -14,7 +14,7 @@ export const AddProduct = async (productData) => {
 };
 
 // get all products
-export const GetProducts = async (filters) => {
+export const GetProducts = async (filters = {}) => {
   try {
     const response = await axiosInstance.post(
       "/api/products/get-products",
@@ -22,7 +22,8 @@ export const GetProducts = async (filters) => {
     );
     return response.data;
   } catch (error) {
-    return error.message;
+    // return a consistent error object shape
+    return { success: false, message: error.message };
   }
 };
 
