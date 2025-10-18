@@ -81,3 +81,16 @@ export const UpdateUserStatus = async (id, status) => {
     return { success: false, message: error.message };
   }
 };
+
+// update user status
+export const UpdateUserRole = async (id, status) => {
+  try {
+    const response = await axiosInstance.put(
+      `/api/users/update-user-role/${id}`,
+      { status }
+    );
+    return response.data;
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
