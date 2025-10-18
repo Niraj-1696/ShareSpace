@@ -2,9 +2,20 @@
 import { axiosInstance } from "./axiosinstance";
 
 // ✅ Correct export
-export const RegisterUser = async (payload) => {
+export const RegisterUser = async (payload, isMultipart = false) => {
   console.log("RegisterUser called", payload); // optional debug
-  const response = await axiosInstance.post("/api/users/register", payload);
+  const config = isMultipart
+    ? {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    : {};
+  const response = await axiosInstance.post(
+    "/api/users/register",
+    payload,
+    config
+  );
   return response.data;
 };
 
@@ -70,11 +81,13 @@ export const GetAllUsers = async () => {
 };
 
 // update user status
-export const UpdateUserStatus = async (id, status) => {
+export const UpdateUserStatus = async (id, statusData) => {
   try {
+    const payload =
+      typeof statusData === "string" ? { status: statusData } : statusData;
     const response = await axiosInstance.put(
       `/api/users/update-user-status/${id}`,
-      { status }
+      payload
     );
     return response.data;
   } catch (error) {

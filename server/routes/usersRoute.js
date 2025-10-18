@@ -1,34 +1,82 @@
-const router = require("express").Router();
+const express = require("express");
+const router = express.Router();
 const User = require("../models/usermodel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middlwares/authMiddleware");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
+const cloudinary = require("../config/cloudinaryConfig");
+const multer = require("multer");
+const Tesseract = require("tesseract.js");
 
-// ✅ New user registration
-router.post("/register", async (req, res) => {
+// Multer setup for file upload
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// Registration with image upload and OCR
+router.post("/register", upload.single("collegeIdImage"), async (req, res) => {
   try {
-    // Check if user already exists
-    const existingUser = await User.findOne({ email: req.body.email });
+    // Check for duplicate email, psid, rollNo
+    const { name, email, password } = req.body;
+    // Image file
+    const file = req.file;
+    if (!file) {
+      throw new Error("College ID image is required");
+    }
+
+    // Upload image to Cloudinary using base64
+    const base64Image = `data:${file.mimetype};base64,${file.buffer.toString(
+      "base64"
+    )}`;
+    const uploadResult = await cloudinary.uploader.upload(base64Image, {
+      resource_type: "image",
+      folder: "college_ids",
+    });
+
+    // Run OCR using Tesseract.js
+    const ocrResult = await Tesseract.recognize(file.buffer, "eng");
+    const text = ocrResult.data.text;
+
+    // Extract PSID and Roll No using regex
+    const psidMatch = text.match(/PSID[:\s]*([0-9]+)/i);
+    const rollNoMatch = text.match(/ROLL\s*NO[:\s]*([0-9]+)/i);
+    const psid = psidMatch ? psidMatch[1] : null;
+    const rollNo = rollNoMatch ? rollNoMatch[1] : null;
+    if (!psid || !rollNo) {
+      throw new Error(
+        "Could not extract PSID or Roll No from image. Please upload a clear image."
+      );
+    }
+
+    // Check for duplicate PSID or Roll No
+    const existingUser = await User.findOne({
+      $or: [{ email }, { psid }, { rollNo }],
+    });
     if (existingUser) {
-      throw new Error("User already exists");
+      throw new Error("User with this email, PSID, or Roll No already exists");
     }
 
     // Hash password
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(req.body.password, salt); // ✅ Fix typo from 'hashedOassword'
-
-    req.body.password = hashedPassword;
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     // Save user
-    const newUser = new User(req.body);
-    await newUser.save(); // ✅ Fix typo from `saver()`
+    const newUser = new User({
+      name,
+      email,
+      password: hashedPassword,
+      psid,
+      rollNo,
+      collegeIdImage: uploadResult.secure_url,
+      status: "pending",
+    });
+    await newUser.save();
 
     res.send({
       success: true,
-      message: "User created successfully",
-      user: newUser, // 🔁 Add if you want to send back user data
+      message: "User created successfully. Awaiting admin approval.",
+      user: newUser,
     });
   } catch (error) {
     res.send({
@@ -37,7 +85,6 @@ router.post("/register", async (req, res) => {
     });
   }
 });
-
 // ✅ User login
 router.post("/login", async (req, res) => {
   try {

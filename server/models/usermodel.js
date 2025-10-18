@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -33,6 +34,24 @@ const userSchema = new mongoose.Schema(
     profilePicture: {
       type: String,
       default: "",
+    },
+    // College registration fields
+    psid: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+    rollNo: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+    collegeIdImage: {
+      type: String,
+      required: true,
+      trim: true,
     },
   },
   {
