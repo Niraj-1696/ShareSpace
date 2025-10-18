@@ -1,6 +1,7 @@
 import React from "react";
 import { Tabs } from "antd";
 import Products from "./Products";
+import Users from "./Users";
 function Admin() {
   return (
     <Tabs>
@@ -8,7 +9,7 @@ function Admin() {
         <Products />
       </Tabs.TabPane>
       <Tabs.TabPane tab="Users" key="2">
-        <h1>Users</h1>
+        <Users />
       </Tabs.TabPane>
     </Tabs>
   );

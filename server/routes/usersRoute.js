@@ -197,4 +197,20 @@ router.get("/get-current-user", authMiddleware, async (req, res) => {
   }
 });
 
+// get all users
+router.get("/get-users", authMiddleware, async (req, res) => {
+  try {
+    const users = await User.find();
+    res.send({
+      success: true,
+      data: users,
+    });
+  } catch (error) {
+    res.send({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 module.exports = router;
