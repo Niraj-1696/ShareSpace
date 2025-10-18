@@ -77,3 +77,25 @@ export const UploadProductImage = async (payload) => {
     return err;
   }
 };
+
+// update product status
+export const UpdateProductStatus = async (id, status) => {
+  try {
+    console.log("Updating status:", { id, status }); // Debug log
+    const response = await axiosInstance.put(
+      `/api/products/update-product-status/${id}`,
+      { status }
+    );
+    if (response.data.success) {
+      return response.data;
+    } else {
+      throw new Error(response.data.message || "Failed to update status");
+    }
+  } catch (error) {
+    console.error("Status update error:", error);
+    return {
+      success: false,
+      message: error.response?.data?.message || error.message,
+    };
+  }
+};

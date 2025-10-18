@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Button, message, Table } from "antd";
-import { GetProducts } from "../../apicalls/products";
+import { GetProducts, UpdateProductStatus } from "../../apicalls/products";
 import { Setloader } from "../../Redux/loadersSlice";
 import { useDispatch, useSelector } from "react-redux"; // ✅ added useSelector
 import moment from "moment";
@@ -36,7 +36,23 @@ function Products() {
     }
   };
 
-  const onStatusUpdate = async (id, status) => {};
+  const onStatusUpdate = async (id, status) => {
+    try {
+      dispatch(Setloader(true));
+      const response = await UpdateProductStatus(id, status);
+      dispatch(Setloader(false));
+      if (response.success) {
+        message.success(response.message);
+        getData(); // Refresh the product list
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      dispatch(Setloader(false));
+      message.error(error.message);
+    }
+  };
+
   // ✅ Table columns
   const columns = [
     { title: "Product", dataIndex: "name" },
@@ -51,7 +67,13 @@ function Products() {
     { title: "Price", dataIndex: "price" },
     { title: "Category", dataIndex: "category" },
     { title: "Age", dataIndex: "age" },
-    { title: "Status", dataIndex: "status" },
+    {
+      title: "Status",
+      dataIndex: "status",
+      render: (text, record) => {
+        return record.status.toUpperCase();
+      },
+    },
     {
       title: "Added on",
       dataIndex: "createdAt",
@@ -92,9 +114,17 @@ function Products() {
             {status === "blocked" && (
               <span
                 className="underline cursor-pointer"
-                onClick={() => onStatusUpdate(_id, "unblocked")}
+                onClick={() => onStatusUpdate(_id, "approved")}
               >
                 Unblock
+              </span>
+            )}
+            {status === "unblocked" && (
+              <span
+                className="underline cursor-pointer"
+                onClick={() => onStatusUpdate(_id, "approved")}
+              >
+                Approve
               </span>
             )}
           </div>

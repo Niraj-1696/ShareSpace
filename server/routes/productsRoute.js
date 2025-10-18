@@ -162,4 +162,47 @@ router.post(
   }
 );
 
+// update product status
+router.put("/update-product-status/:id", authMiddleware, async (req, res) => {
+  try {
+    console.log("Updating product status. ID:", req.params.id);
+    console.log("Request body:", req.body);
+
+    const { status } = req.body;
+    if (!status) {
+      return res.status(400).json({
+        success: false,
+        message: "Status is required",
+      });
+    }
+
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    console.log("Current status:", product.status, "New status:", status);
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true } // return updated document
+    );
+
+    console.log("Updated product status:", updatedProduct.status);
+
+    res.status(200).json({
+      success: true,
+      message: "Product status updated successfully",
+      product: updatedProduct,
+    });
+  } catch (error) {
+    console.error("❌ Error updating product status:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 module.exports = router;
