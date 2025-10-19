@@ -1,12 +1,19 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Divider, message } from "antd";
-import { GetProductById, GetProducts } from "../../apicalls/products";
+import { Divider, message, Button } from "antd";
+import {
+  GetAllBids,
+  GetProductById,
+  GetProducts,
+} from "../../apicalls/products";
 import { Setloader } from "../../Redux/loadersSlice";
 import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
+import BidModal from "./BidModal";
 
 function ProductInfo() {
+  const { user } = useSelector((state) => state.users);
+  const [showAddNewBid, setShowAddNewBid] = React.useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
   const [product, setProduct] = React.useState(null);
   const navigate = useNavigate();
@@ -18,7 +25,8 @@ function ProductInfo() {
       const response = await GetProductById(id);
       dispatch(Setloader(false));
       if (response.success) {
-        setProduct(response.data);
+        const bidsResponse = await GetAllBids({ productId: id });
+        setProduct({ ...response.data, bids: bidsResponse.data });
       }
     } catch (error) {
       dispatch(Setloader(false));
@@ -31,7 +39,7 @@ function ProductInfo() {
   return (
     product && (
       <div>
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-2 gap-5 mt-5">
           {/*images*/}
           <div clasdssName="flex flex-col gap-5">
             <img
@@ -57,8 +65,8 @@ function ProductInfo() {
             </div>
             <Divider />
             <div>
-              <h1>Added On</h1>
-              <span>
+              <h1 className="text-gray-600">Added On</h1>
+              <span className="text-gray-600">
                 {moment(product.createdAt).format("MMMM Do , YYYY hh:mm A")}
               </span>
             </div>
@@ -117,8 +125,28 @@ function ProductInfo() {
                 <span>{product.seller.email}</span>
               </div>
             </div>
+            <Divider />
+            <div className="flex flex-col">
+              <div className="flex justify-between">
+                <h1 className="text-2xl font-semibold text-orange-900">Bids</h1>
+                <Button
+                  onClick={() => setShowAddNewBid(!showAddNewBid)}
+                  disabled={user._id === product.seller._id}
+                >
+                  New Bid
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
+        {showAddNewBid && (
+          <BidModal
+            showBidModal={showAddNewBid}
+            setShowBidModal={setShowAddNewBid}
+            product={product}
+            reloadData={getData}
+          />
+        )}
       </div>
     )
   );
