@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Divider, message, Button } from "antd";
+import { message, Button } from "antd";
 import {
   GetAllBids,
   GetProductById,
@@ -10,6 +10,7 @@ import { Setloader } from "../../Redux/loadersSlice";
 import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
 import BidModal from "./BidModal";
+import Divider from "../../Components/Divider";
 
 function ProductInfo() {
   const { user } = useSelector((state) => state.users);

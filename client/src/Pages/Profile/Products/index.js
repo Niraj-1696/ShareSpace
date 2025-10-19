@@ -5,8 +5,10 @@ import { GetProducts, DeleteProduct } from "../../../apicalls/products";
 import { Setloader } from "../../../Redux/loadersSlice";
 import { useDispatch, useSelector } from "react-redux"; // ✅ added useSelector
 import moment from "moment";
+import Bids from "./Bids";
 
 function Products() {
+  const [showBids, setShowBids] = React.useState(false);
   const [selectedProduct, setSelectedProduct] = React.useState(null);
   const [products, setProducts] = React.useState([]);
   const [showProductForm, setShowProductForm] = React.useState(false);
@@ -75,7 +77,7 @@ function Products() {
       title: "Action",
       dataIndex: "action",
       render: (text, record) => (
-        <div className="flex gap-5">
+        <div className="flex gap-5 items-center">
           <i
             className="ri-delete-bin-line"
             onClick={() => handleDeleteProduct(record._id)}
@@ -87,6 +89,15 @@ function Products() {
               setShowProductForm(true);
             }}
           ></i>
+          <span
+            className="underline cursor-pointer"
+            onClick={() => {
+              setSelectedProduct(record);
+              setShowBids(true);
+            }}
+          >
+            Show Bids
+          </span>
         </div>
       ),
     },
@@ -125,6 +136,13 @@ function Products() {
           setShowProductForm={setShowProductForm}
           selectedProduct={selectedProduct}
           getData={getData}
+        />
+      )}
+      {showBids && (
+        <Bids
+          showBidModal={showBids}
+          setShowBidModal={setShowBids}
+          product={selectedProduct}
         />
       )}
     </div>
