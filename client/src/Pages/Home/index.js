@@ -11,13 +11,19 @@ function Home() {
   const [filters, setFilters] = React.useState({
     status: "approved",
   });
+  const { user } = useSelector((state) => state.users);
   const [products, setProducts] = React.useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const getData = async () => {
     try {
       dispatch(Setloader(true));
-      const response = await GetProducts({ status: "approved" });
+      const payload = {
+        status: filters.status || "approved",
+        categories: filters.category || [],
+        age: filters.age || [],
+      };
+      const response = await GetProducts(payload);
       dispatch(Setloader(false));
       if (response.success) {
         setProducts(response.data);
@@ -29,8 +35,8 @@ function Home() {
   };
   React.useEffect(() => {
     getData();
-  }, []);
-  const { user } = useSelector((state) => state.users);
+  }, [JSON.stringify(filters)]);
+
   return (
     <div>
       <div className="flex gap-5">
@@ -54,7 +60,7 @@ function Home() {
             <input
               type="text"
               placeholder="Search products..."
-              className="border border-gray-300 rounded p-2 h-14"
+              className="border border-gray-300 rounded border-solid px-2 py-1 h-14"
             />
           </div>
           <div className="grid gap-5 grid-cols-4">

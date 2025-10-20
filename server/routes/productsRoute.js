@@ -77,7 +77,7 @@ router.post("/get-products", async (req, res) => {
       status,
       category,
       categories = [],
-      age = [], // reserved for future filtering
+      age = [], // array of range strings like ["0-1", "2-3"]
     } = req.body;
 
     const filters = {};
@@ -86,6 +86,26 @@ router.post("/get-products", async (req, res) => {
     if (category) filters.category = category;
     if (Array.isArray(categories) && categories.length > 0)
       filters.category = { $in: categories };
+
+    // Apply age range filters if provided
+    if (Array.isArray(age) && age.length > 0) {
+      const ageOrClauses = [];
+      age.forEach((range) => {
+        if (typeof range !== "string") return;
+        const parts = range.split("-");
+        if (parts.length !== 2) return;
+        const min = Number(parts[0]);
+        const max = Number(parts[1]);
+        if (!Number.isNaN(min) && !Number.isNaN(max)) {
+          ageOrClauses.push({ age: { $gte: min, $lte: max } });
+        }
+      });
+      if (ageOrClauses.length > 0) {
+        // Combine with existing filters using $and to respect other criteria
+        // Note: $and with $or ensures products match any selected age range AND other filters
+        filters.$or = ageOrClauses;
+      }
+    }
 
     const products = await Product.find(filters)
       .populate("seller")
