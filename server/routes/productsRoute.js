@@ -37,6 +37,7 @@ router.post("/add-product", authMiddleware, async (req, res) => {
       warrentyAvailable,
       accessoriesAvailable,
       boxAvailable,
+      showBidsOnProductPage,
       status,
     } = req.body;
 
@@ -51,6 +52,7 @@ router.post("/add-product", authMiddleware, async (req, res) => {
       warrentyAvailable,
       accessoriesAvailable,
       boxAvailable,
+      showBidsOnProductPage,
       status,
       seller: req.userId,
     });

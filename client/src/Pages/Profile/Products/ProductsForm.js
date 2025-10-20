@@ -153,6 +153,17 @@ function ProductsForm({
                     ))}
                   </div>
 
+                  {/* Show bids on product page */}
+                  <div className="mt-3">
+                    <Form.Item
+                      name="showBidsOnProductPage"
+                      valuePropName="checked"
+                      initialValue={true}
+                    >
+                      <Checkbox>Show bids on product page</Checkbox>
+                    </Form.Item>
+                  </div>
+
                   {/* Hidden images field for future upload */}
                   <Form.Item name="images" initialValue={[]} hidden>
                     <Input />

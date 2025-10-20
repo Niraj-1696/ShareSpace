@@ -42,6 +42,11 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // Controls whether to show bids section on public product page
+    showBidsOnProductPage: {
+      type: Boolean,
+      default: true,
+    },
     seller: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",

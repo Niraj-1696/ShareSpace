@@ -26,7 +26,7 @@ function ProductInfo() {
       const response = await GetProductById(id);
       dispatch(Setloader(false));
       if (response.success) {
-        const bidsResponse = await GetAllBids({ productId: id });
+        const bidsResponse = await GetAllBids({ product: id });
         setProduct({ ...response.data, bids: bidsResponse.data });
       }
     } catch (error) {
@@ -127,17 +127,56 @@ function ProductInfo() {
               </div>
             </div>
             <Divider />
-            <div className="flex flex-col">
-              <div className="flex justify-between">
-                <h1 className="text-2xl font-semibold text-orange-900">Bids</h1>
-                <Button
-                  onClick={() => setShowAddNewBid(!showAddNewBid)}
-                  disabled={user._id === product.seller._id}
-                >
-                  New Bid
-                </Button>
+            {product.showBidsOnProductPage !== false && (
+              <div className="flex flex-col">
+                <div className="flex justify-between">
+                  <h1 className="text-2xl font-semibold text-orange-900">
+                    Bids
+                  </h1>
+                  <Button
+                    onClick={() => setShowAddNewBid(!showAddNewBid)}
+                    disabled={user._id === product.seller._id}
+                  >
+                    New Bid
+                  </Button>
+                </div>
+                <div className="flex flex-col gap-3 mt-3">
+                  {product.bids && product.bids.length > 0 ? (
+                    product.bids.map((bid) => {
+                      return (
+                        <div
+                          key={bid._id}
+                          className="border border-gray-400 border-solid p-3 rounded"
+                        >
+                          <div className="flex justify-between">
+                            <span className="font-semibold">Name:</span>
+                            <span>{bid.buyer?.name || "N/A"}</span>
+                          </div>
+                          <div className="flex justify-between mt-2">
+                            <span className="font-semibold">Bid Amount:</span>
+                            <span>₹ {bid.bidAmount}</span>
+                          </div>
+                          <div className="flex justify-between mt-2">
+                            <span className="font-semibold">
+                              Bid Placed On :
+                            </span>
+                            <span>
+                              {moment(bid.createdAt).format(
+                                "MMM Do YYYY, h:mm a"
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="text-gray-500 text-center p-4">
+                      No bids yet
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
         {showAddNewBid && (
