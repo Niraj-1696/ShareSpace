@@ -6,11 +6,15 @@ import { EditProduct, UploadProductImage } from "../../../apicalls/products";
 
 function Images({ selectedProduct, setShowProductForm, getData }) {
   const [showPreview, setShowPreview] = React.useState(true);
-  const [images, setImages] = React.useState(selectedProduct.images || []);
+  const [images, setImages] = React.useState(selectedProduct?.images || []);
   const [file, setFile] = React.useState(null);
+  const [fileList, setFileList] = React.useState([]); // control Upload list
   const dispatch = useDispatch();
 
   const upload = async () => {
+    if (!selectedProduct?._id) {
+      return message.error("Save the product first before uploading images.");
+    }
     if (!file) return message.error("Please select a file");
 
     try {
@@ -30,7 +34,9 @@ function Images({ selectedProduct, setShowProductForm, getData }) {
         setImages([...images, response.data]);
         setShowPreview(false);
         getData();
-        setFile(null); // clear file
+        // clear current selection so next upload doesn't reuse previous file
+        setFile(null);
+        setFileList([]);
       } else {
         message.error(response.message || "Upload failed");
       }
@@ -42,6 +48,9 @@ function Images({ selectedProduct, setShowProductForm, getData }) {
   };
 
   const deleteImage = async (image) => {
+    if (!selectedProduct?._id) {
+      return message.error("Save the product first before deleting images.");
+    }
     try {
       dispatch(Setloader(true));
       const updatedImagesArray = images.filter((img) => img !== image);
@@ -64,6 +73,11 @@ function Images({ selectedProduct, setShowProductForm, getData }) {
 
   return (
     <div>
+      {!selectedProduct && (
+        <div className="text-gray-500 mb-3">
+          Save the product to enable image uploads.
+        </div>
+      )}
       <div className="flex gap-5 mb-5 flex-wrap">
         {images.map((image, index) => (
           <div
@@ -83,11 +97,18 @@ function Images({ selectedProduct, setShowProductForm, getData }) {
         ))}
       </div>
       <Upload
+        accept="image/*"
         listType="picture"
+        multiple={false}
+        maxCount={1}
         showUploadList={showPreview}
         beforeUpload={() => false} // prevent auto upload
-        onChange={(info) => {
-          setFile(info.file);
+        fileList={fileList}
+        onChange={({ file, fileList: nextList }) => {
+          // keep only the latest file; AntD may accumulate
+          const latestList = nextList.slice(-1);
+          setFileList(latestList);
+          setFile(file);
           setShowPreview(true);
         }}
       >

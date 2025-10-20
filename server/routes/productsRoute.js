@@ -72,16 +72,24 @@ router.post("/add-product", authMiddleware, async (req, res) => {
 // Get all products
 router.post("/get-products", async (req, res) => {
   try {
-    const { seller, categories = [], age = [] } = req.body;
-    let filters = {};
-    if (seller) {
-      filters.seller = seller;
-    }
-    // build the query, populate seller, then await the final result
-    const products = await Product.find(filters).populate("seller").sort({
-      createdAt: -1,
-      _id: -1,
-    });
+    const {
+      seller,
+      status,
+      category,
+      categories = [],
+      age = [], // reserved for future filtering
+    } = req.body;
+
+    const filters = {};
+    if (seller) filters.seller = seller;
+    if (status) filters.status = new RegExp(`^${status}$`, "i"); // case-insensitive match
+    if (category) filters.category = category;
+    if (Array.isArray(categories) && categories.length > 0)
+      filters.category = { $in: categories };
+
+    const products = await Product.find(filters)
+      .populate("seller")
+      .sort({ createdAt: -1, _id: -1 });
     res.status(200).json({ success: true, data: products });
   } catch (error) {
     console.error("❌ Error fetching products:", error);
@@ -183,9 +191,6 @@ router.post(
 // update product status
 router.put("/update-product-status/:id", authMiddleware, async (req, res) => {
   try {
-    console.log("Updating product status. ID:", req.params.id);
-    console.log("Request body:", req.body);
-
     const { status } = req.body;
     if (!status) {
       return res.status(400).json({
@@ -202,15 +207,11 @@ router.put("/update-product-status/:id", authMiddleware, async (req, res) => {
       });
     }
 
-    console.log("Current status:", product.status, "New status:", status);
-
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
       { status },
       { new: true } // return updated document
     );
-
-    console.log("Updated product status:", updatedProduct.status);
 
     res.status(200).json({
       success: true,

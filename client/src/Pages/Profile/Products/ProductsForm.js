@@ -60,8 +60,9 @@ function ProductsForm({
 
       if (response.success) {
         message.success(response.message);
-        // ✅ Optional: auto-switch to Images tab after adding
-        if (!selectedProduct) setSelectedTab("2");
+        // Only switch to Images tab when editing an existing product
+        // For new products, remain on General tab to avoid rendering Images with null product
+        if (selectedProduct) setSelectedTab("2");
         getData();
       } else {
         message.error(response.message);
@@ -127,7 +128,7 @@ function ProductsForm({
                         <Select placeholder="Select Category">
                           <Option value="electronics">Electronics</Option>
                           <Option value="fashion">Fashion</Option>
-                          <Option value="home">Home</Option>
+                          <Option value="books">Books</Option>
                           <Option value="sports">Sports</Option>
                         </Select>
                       </Form.Item>

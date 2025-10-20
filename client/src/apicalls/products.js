@@ -1,5 +1,4 @@
 import { axiosInstance } from "./axiosinstance";
-import { message } from "antd";
 // add a new product
 export const AddProduct = async (productData) => {
   try {
@@ -71,20 +70,11 @@ export const UploadProductImage = async (payload) => {
       { headers: { "Content-Type": "multipart/form-data" } }
     );
 
-    if (response.data.success) {
-      message.success(response.data.message || "Image uploaded successfully");
-      return response.data; // contains success and imageUrl
-    } else {
-      message.error(response.data.message || "Upload failed");
-      return { success: false };
-    }
+    // Return raw response shape; UI components will handle messages
+    return response.data;
   } catch (error) {
-    const err = error.response?.data || {
-      success: false,
-      message: error.message,
-    };
-    message.error(err.message || "Upload failed");
-    return err;
+    // Return a consistent error object; no UI side-effects here
+    return error.response?.data || { success: false, message: error.message };
   }
 };
 

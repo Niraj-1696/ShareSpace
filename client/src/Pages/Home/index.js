@@ -7,15 +7,12 @@ import { useNavigate } from "react-router-dom";
 
 function Home() {
   const [products, setProducts] = React.useState([]);
-  const [filters, setFilters] = React.useState({
-    status: "approved",
-  });
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const getData = async () => {
     try {
       dispatch(Setloader(true));
-      const response = await GetProducts(filters);
+      const response = await GetProducts({ status: "approved" });
       dispatch(Setloader(false));
       if (response.success) {
         setProducts(response.data);
@@ -31,7 +28,7 @@ function Home() {
   const { user } = useSelector((state) => state.users);
   return (
     <div>
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-5 gap-5">
         {products?.map((product) => (
           <div
             className="border border-gray-300 rounded border-solid flex flex-col gap-5 pb-2 cursor-pointer"
@@ -40,10 +37,10 @@ function Home() {
           >
             <img
               src={product.images[0]}
-              className="w-full h-64 object-cover"
+              className="w-full h-52 p-2 rounded-md object-cover"
               alt=""
             />
-            <div className="px-2 flex flex-col gap-1">
+            <div className="px-2 flex flex-col">
               <h1 className="text-lg font-semibold">{product.name}</h1>
               <p className="text-sm">{product.description}</p>
               <Divider />
