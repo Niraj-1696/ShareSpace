@@ -80,14 +80,15 @@ router.post("/get-products", async (req, res) => {
       age = [], // array of range strings like ["0-1", "2-3"]
     } = req.body;
 
-    const filters = {};
-    if (seller) filters.seller = seller;
-    if (status) filters.status = new RegExp(`^${status}$`, "i"); // case-insensitive match
-    if (category) filters.category = category;
+    // Build base AND clauses
+    const andClauses = [];
+    if (seller) andClauses.push({ seller });
+    if (status) andClauses.push({ status: new RegExp(`^${status}$`, "i") });
+    if (category) andClauses.push({ category });
     if (Array.isArray(categories) && categories.length > 0)
-      filters.category = { $in: categories };
+      andClauses.push({ category: { $in: categories } });
 
-    // Apply age range filters if provided
+    // Apply age range filters if provided (as an OR inside the AND stack)
     if (Array.isArray(age) && age.length > 0) {
       const ageOrClauses = [];
       age.forEach((range) => {
@@ -101,13 +102,14 @@ router.post("/get-products", async (req, res) => {
         }
       });
       if (ageOrClauses.length > 0) {
-        // Combine with existing filters using $and to respect other criteria
-        // Note: $and with $or ensures products match any selected age range AND other filters
-        filters.$or = ageOrClauses;
+        andClauses.push({ $or: ageOrClauses });
       }
     }
 
-    const products = await Product.find(filters)
+    const finalQuery =
+      andClauses.length > 1 ? { $and: andClauses } : andClauses[0] || {};
+
+    const products = await Product.find(finalQuery)
       .populate("seller")
       .sort({ createdAt: -1, _id: -1 });
     res.status(200).json({ success: true, data: products });
