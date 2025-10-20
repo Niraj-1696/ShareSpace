@@ -20,7 +20,9 @@ app.use(
 const usersRoute = require("./routes/usersRoute");
 const productsRoute = require("./routes/productsRoute");
 const bidsRoute = require("./routes/bidesRoute");
+const notificationsRoute = require("./routes/notificationsRoute");
 
+app.use("/api/notifications", notificationsRoute);
 app.use("/api/bids", bidsRoute);
 app.use("/api/users", usersRoute);
 app.use("/api/products", productsRoute);

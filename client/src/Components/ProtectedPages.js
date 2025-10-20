@@ -5,8 +5,12 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Setloader } from "../Redux/loadersSlice";
 import { SetUser } from "../Redux/usersSlice";
+import { Avatar, Badge } from "antd";
+import Notifications from "../Components/Notifications";
 
 function ProtectedPages({ children }) {
+  const [notifications = [], setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
   const { user } = useSelector((state) => state.users);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -51,7 +55,6 @@ function ProtectedPages({ children }) {
           </h1>
 
           <div className="bg-white py-2 px-5 rounded flex gap-1 items-center">
-            <i className="ri-shield-user-line"></i>
             <span
               className="underline cursor-pointer uppercase"
               onClick={() => {
@@ -64,6 +67,19 @@ function ProtectedPages({ children }) {
             >
               {user.name}
             </span>
+            <Badge
+              count={
+                notifications?.filter((notification) => !notification.read)
+                  .length
+              }
+              onClick={() => setShowNotifications(true)}
+              className="cursor-pointer"
+            >
+              <Avatar
+                shape="circle"
+                icon={<i class="ri-notification-line"></i>}
+              />
+            </Badge>
             <i
               className="ri-logout-box-r-line ml-10"
               onClick={() => {
@@ -76,6 +92,15 @@ function ProtectedPages({ children }) {
 
         {/* body */}
         <div className="p-5">{children}</div>
+
+        {
+          <Notifications
+            notifications={notifications}
+            reloadNotifications={setNotifications}
+            showNotifications={showNotifications}
+            setShowNotifications={setShowNotifications}
+          />
+        }
       </div>
     )
   );
