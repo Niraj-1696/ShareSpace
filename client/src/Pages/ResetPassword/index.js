@@ -75,7 +75,13 @@ function ResetPassword() {
             <Input.Password />
           </Form.Item>
 
-          <Button type="primary" htmlType="submit" block className="mt-2">
+          <Button
+            type="primary"
+            htmlType="submit"
+            block
+            className="mt-2 h-12 rounded-lg bg-primary hover:bg-blue-600 font-medium transition-colors"
+            style={{ backgroundColor: "#3b82f6", borderColor: "#3b82f6" }}
+          >
             Reset Password
           </Button>
 

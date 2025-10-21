@@ -1,6 +1,8 @@
+/* stylelint-disable at-rule-no-unknown */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* stylelint-enable at-rule-no-unknown */
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100;500&display=swap");
 * {
   margin: 0;
@@ -28,6 +30,52 @@ select:focus {
 button {
   height: 45px !important;
   box-shadow: none !important;
+}
+
+/* Override Ant Design primary button colors to use blue instead of green */
+.ant-btn-primary {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+  color: white !important;
+}
+
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+  color: white !important;
+}
+
+.ant-btn-primary:active {
+  background-color: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+}
+
+.ant-btn-primary[disabled] {
+  background-color: #93c5fd !important;
+  border-color: #93c5fd !important;
+  opacity: 0.6;
+}
+
+/* Override Modal OK button */
+.ant-modal-footer .ant-btn-primary {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+}
+
+.ant-modal-footer .ant-btn-primary:hover {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+}
+
+/* Override link buttons to use blue */
+.ant-btn-link {
+  color: #3b82f6 !important;
+}
+
+.ant-btn-link:hover,
+.ant-btn-link:focus {
+  color: #2563eb !important;
 }
 
 table {

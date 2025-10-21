@@ -61,8 +61,18 @@ function Products() {
 
   // ✅ Table columns
   const columns = [
+    {
+      title: "Product",
+      dataIndex: "images",
+      render: (text, record) => (
+        <img
+          src={record?.images?.length > 0 ? record.images[0] : ""}
+          alt=""
+          className="w-20 h-20 object-cover rounded-md"
+        />
+      ),
+    },
     { title: "Name", dataIndex: "name" },
-    { title: "Description", dataIndex: "description" },
     { title: "Price", dataIndex: "price" },
     { title: "Category", dataIndex: "category" },
     { title: "Age", dataIndex: "age" },
@@ -108,6 +118,7 @@ function Products() {
     if (user?._id) {
       getData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   return (

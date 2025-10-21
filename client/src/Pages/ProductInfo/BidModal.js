@@ -50,6 +50,21 @@ function BidModal({ showBidModal, setShowBidModal, product, reloadData }) {
       centered
       width={600}
       onOk={() => formref.current.submit()}
+      okButtonProps={{
+        style: {
+          backgroundColor: "#3b82f6",
+          borderColor: "#3b82f6",
+          color: "white",
+        },
+        onMouseEnter: (e) => {
+          e.target.style.backgroundColor = "#2563eb";
+          e.target.style.borderColor = "#2563eb";
+        },
+        onMouseLeave: (e) => {
+          e.target.style.backgroundColor = "#3b82f6";
+          e.target.style.borderColor = "#3b82f6";
+        },
+      }}
     >
       <div className="flex flex-col gap-5 mb-5">
         <h1 className="text-2xl font-semibold text-orange-900 text-center">

@@ -11,7 +11,6 @@ import {
   GetAllNotifications,
   ReadAllNotifications,
 } from "../apicalls/notifications";
-import ReactRef from "react";
 
 function ProtectedPages({ children }) {
   const [notifications = [], setNotifications] = useState([]);
@@ -45,6 +44,7 @@ function ProtectedPages({ children }) {
     } else {
       navigate("/login");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Load notifications when user changes or when modal is opened
@@ -95,17 +95,17 @@ function ProtectedPages({ children }) {
     user && (
       <div>
         {/* header */}
-        <div className="flex justify-between items-center bg-primary p-5">
+        <div className="flex justify-between items-center bg-primary p-5 shadow-md">
           <h1
-            className="text-2xl text-white cursor-pointer"
+            className="text-2xl text-white cursor-pointer font-semibold"
             onClick={() => navigate("/")}
           >
             ShareSpace
           </h1>
 
-          <div className="bg-white py-2 px-5 rounded flex gap-1 items-center">
+          <div className="bg-white py-2 px-5 rounded-lg flex gap-3 items-center shadow-sm">
             <span
-              className="underline cursor-pointer uppercase"
+              className="underline cursor-pointer uppercase text-primary font-medium hover:text-blue-600 transition-colors"
               onClick={() => {
                 if (user.role === "user") {
                   navigate("/profile");
@@ -123,14 +123,16 @@ function ProtectedPages({ children }) {
               }
               onClick={() => setShowNotifications(true)}
               className="cursor-pointer"
+              style={{ backgroundColor: "#dc2626" }}
             >
               <Avatar
                 shape="circle"
-                icon={<i class="ri-notification-line"></i>}
+                icon={<i className="ri-notification-line"></i>}
+                style={{ backgroundColor: "#3b82f6" }}
               />
             </Badge>
             <i
-              className="ri-logout-box-r-line ml-10"
+              className="ri-logout-box-r-line ml-5 cursor-pointer text-gray-600 hover:text-danger transition-colors"
               onClick={() => {
                 localStorage.removeItem("token");
                 navigate("/login");
@@ -140,7 +142,7 @@ function ProtectedPages({ children }) {
         </div>
 
         {/* body */}
-        <div className="p-5">{children}</div>
+        <div className="p-5 bg-background min-h-screen">{children}</div>
 
         {
           <Notifications

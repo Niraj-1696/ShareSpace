@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
-import { Button, message, Table } from "antd";
+import { message, Table } from "antd";
 import { GetProducts, UpdateProductStatus } from "../../apicalls/products";
 import { Setloader } from "../../Redux/loadersSlice";
-import { useDispatch, useSelector } from "react-redux"; // ✅ added useSelector
+import { useDispatch } from "react-redux";
 import moment from "moment";
 
 function Products() {
@@ -136,6 +136,7 @@ function Products() {
   // ✅ Fetch data on mount
   useEffect(() => {
     getData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

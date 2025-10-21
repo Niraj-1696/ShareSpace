@@ -1,5 +1,5 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Divider, message } from "antd";
 import { GetProducts } from "../../apicalls/products";
 import { Setloader } from "../../Redux/loadersSlice";
@@ -14,7 +14,6 @@ function Home() {
   const [searchText, setSearchText] = React.useState("");
   const [allProducts, setAllProducts] = React.useState([]);
   const [products, setProducts] = React.useState([]);
-  const { user } = useSelector((state) => state.users);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const getData = async () => {
@@ -70,6 +69,7 @@ function Home() {
 
   React.useEffect(() => {
     getData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(filters)]);
 
   return (
@@ -84,10 +84,10 @@ function Home() {
           />
         )}
         <div className="flex flex-col gap-5 flex-1">
-          <div className="flex gap-5 items-center justify-between">
+          <div className="flex gap-5 items-center justify-between bg-white p-4 rounded-lg shadow-sm">
             {!showFilters && (
               <i
-                className="ri-equalizer-line text-xl cursor-pointer"
+                className="ri-equalizer-line text-2xl cursor-pointer text-gray-600 hover:text-primary transition-colors"
                 onClick={() => setShowFilters(true)}
                 title="Show filters"
               />
@@ -96,13 +96,13 @@ function Home() {
               <input
                 type="text"
                 placeholder="Search products by name, description, or price..."
-                className="border border-gray-300 rounded border-solid px-4 py-3 h-14 w-full pr-10"
+                className="border border-gray-300 rounded-lg border-solid px-4 py-3 h-12 w-full pr-10 focus:border-primary focus:ring-1 focus:ring-blue-200 transition-all"
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
               />
               {searchText && (
                 <i
-                  className="ri-close-circle-line absolute right-3 top-4 text-2xl text-gray-400 cursor-pointer hover:text-gray-600"
+                  className="ri-close-circle-line absolute right-3 top-3 text-2xl text-gray-400 cursor-pointer hover:text-gray-600 transition-colors"
                   onClick={() => setSearchText("")}
                   title="Clear search"
                 />
@@ -110,28 +110,36 @@ function Home() {
             </div>
           </div>
           {searchText && (
-            <div className="text-sm text-gray-600">
-              Found {products.length} product{products.length !== 1 ? "s" : ""}
+            <div className="text-sm text-gray-600 bg-white p-3 rounded-lg shadow-sm">
+              Found{" "}
+              <span className="font-semibold text-primary">
+                {products.length}
+              </span>{" "}
+              product{products.length !== 1 ? "s" : ""}
               {searchText && ` matching "${searchText}"`}
             </div>
           )}
           <div className="grid gap-5 grid-cols-4">
             {products?.map((product) => (
               <div
-                className="border border-gray-300 rounded border-solid flex flex-col gap-5 pb-2 cursor-pointer"
+                className="border border-gray-200 rounded-lg bg-white flex flex-col gap-3 pb-3 cursor-pointer hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
                 key={product._id}
                 onClick={() => navigate(`/product/${product._id}`)}
               >
                 <img
                   src={product.images[0]}
-                  className="w-full h-52 p-2 rounded-md object-cover"
+                  className="w-full h-52 p-2 rounded-lg object-cover"
                   alt=""
                 />
-                <div className="px-2 flex flex-col">
-                  <h1 className="text-lg font-semibold">{product.name}</h1>
-                  <p className="text-sm">{product.description}</p>
-                  <Divider />
-                  <span className="text-xl font-semibold text-green-700">
+                <div className="px-3 flex flex-col gap-2">
+                  <h1 className="text-lg font-semibold text-gray-800">
+                    {product.name}
+                  </h1>
+                  <p className="text-sm text-gray-600 line-clamp-2">
+                    {product.description}
+                  </p>
+                  <Divider className="my-1" />
+                  <span className="text-xl font-bold text-gray-800">
                     ₹ {product.price}
                   </span>
                 </div>

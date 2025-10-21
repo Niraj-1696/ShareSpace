@@ -1,13 +1,9 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { message, Button } from "antd";
-import {
-  GetAllBids,
-  GetProductById,
-  GetProducts,
-} from "../../apicalls/products";
+import { GetAllBids, GetProductById } from "../../apicalls/products";
 import { Setloader } from "../../Redux/loadersSlice";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import moment from "moment";
 import BidModal from "./BidModal";
 import Divider from "../../Components/Divider";
@@ -17,7 +13,6 @@ function ProductInfo() {
   const [showAddNewBid, setShowAddNewBid] = React.useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
   const [product, setProduct] = React.useState(null);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { id } = useParams();
   const getData = async () => {
@@ -36,6 +31,7 @@ function ProductInfo() {
   };
   React.useEffect(() => {
     getData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     product && (
@@ -52,6 +48,7 @@ function ProductInfo() {
             <div className="flex gap-5">
               {product.images.map((image, index) => (
                 <img
+                  key={index}
                   className={
                     "w-20 h-20 object-cover rounded-md cursor-pointer " +
                     (selectedImageIndex === index

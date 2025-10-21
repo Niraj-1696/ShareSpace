@@ -121,7 +121,13 @@ function Images({ selectedProduct, setShowProductForm, getData }) {
         <Button type="default" onClick={() => setShowProductForm(false)}>
           Cancel
         </Button>
-        <Button type="primary" disabled={!file} onClick={upload}>
+        <Button
+          type="primary"
+          disabled={!file}
+          onClick={upload}
+          style={{ backgroundColor: "#3b82f6", borderColor: "#3b82f6" }}
+          className="hover:bg-blue-600 transition-colors"
+        >
           {file ? "Upload" : "Select File"}
         </Button>
       </div>

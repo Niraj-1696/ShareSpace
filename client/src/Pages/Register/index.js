@@ -103,23 +103,33 @@ function Register() {
   }, [navigate]);
 
   return (
-    <div className="h-screen bg-primary flex justify-center items-center">
-      <div className="bg-white p-5 rounded w-[450px]">
-        <h1 className="text-primary text-2xl">
-          SHSP - <span className="text-gray-400">REGISTER</span>
+    <div className="min-h-screen bg-primary flex justify-center items-center py-8">
+      <div className="bg-white p-8 rounded-lg w-[450px] shadow-xl my-8">
+        <h1 className="text-primary text-2xl font-bold">
+          ShareSpace{" "}
+          <span className="text-gray-400 text-2xl font-normal">REGISTER</span>
         </h1>
         <Divider />
         <Form layout="vertical" onFinish={onFinish}>
           <Form.Item label="Name" name="name" rules={rules}>
-            <Input placeholder="Name" autoComplete="name" />
+            <Input
+              placeholder="Name"
+              autoComplete="name"
+              className="rounded-lg"
+            />
           </Form.Item>
           <Form.Item label="Email" name="email" rules={rules}>
-            <Input placeholder="Email" autoComplete="email" />
+            <Input
+              placeholder="Email"
+              autoComplete="email"
+              className="rounded-lg"
+            />
           </Form.Item>
           <Form.Item label="Password" name="password" rules={rules}>
             <Input.Password
               placeholder="Password"
               autoComplete="new-password"
+              className="rounded-lg"
             />
           </Form.Item>
           <Form.Item label="College ID Image" required>
@@ -130,29 +140,55 @@ function Register() {
               onChange={onImageChange}
               fileList={imageFile ? [{ uid: "1", name: imageFile.name }] : []}
             >
-              <Button loading={ocrLoading} disabled={!!imageFile}>
-                {imageFile ? "Image Uploaded" : "Upload College ID"}
+              <Button
+                loading={ocrLoading}
+                disabled={!!imageFile}
+                className="rounded-lg"
+              >
+                {imageFile ? "Image Uploaded ✓" : "Upload College ID"}
               </Button>
             </Upload>
             {imageFile && (
-              <Button type="default" onClick={onReset} className="mt-2">
+              <Button
+                type="default"
+                onClick={onReset}
+                className="mt-2 rounded-lg"
+              >
                 Reset
               </Button>
             )}
           </Form.Item>
           <Form.Item label="PSID" required>
-            <Input value={psid} disabled placeholder="Extracted from image" />
+            <Input
+              value={psid}
+              disabled
+              placeholder="Extracted from image"
+              className="rounded-lg"
+            />
           </Form.Item>
           <Form.Item label="Roll No" required>
-            <Input value={rollNo} disabled placeholder="Extracted from image" />
+            <Input
+              value={rollNo}
+              disabled
+              placeholder="Extracted from image"
+              className="rounded-lg"
+            />
           </Form.Item>
-          <Button type="primary" htmlType="submit" block className="mt-2">
+          <Button
+            type="primary"
+            htmlType="submit"
+            block
+            className="mt-2 h-12 rounded-lg bg-primary hover:bg-blue-600 font-medium transition-colors"
+          >
             Register
           </Button>
           <div className="mt-5 text-center">
-            <span className="text-gray-500">
+            <span className="text-gray-500 text-sm">
               Already have an account?{" "}
-              <Link to="/Login" className="text-primary">
+              <Link
+                to="/Login"
+                className="text-primary hover:text-blue-600 font-medium transition-colors"
+              >
                 Login
               </Link>
             </span>

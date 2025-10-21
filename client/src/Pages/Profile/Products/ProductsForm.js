@@ -91,6 +91,21 @@ function ProductsForm({
       width={1000}
       okText="Save"
       onOk={() => formRef.current.submit()}
+      okButtonProps={{
+        style: {
+          backgroundColor: "#3b82f6",
+          borderColor: "#3b82f6",
+          color: "white",
+        },
+        onMouseEnter: (e) => {
+          e.target.style.backgroundColor = "#2563eb";
+          e.target.style.borderColor = "#2563eb";
+        },
+        onMouseLeave: (e) => {
+          e.target.style.backgroundColor = "#3b82f6";
+          e.target.style.borderColor = "#3b82f6";
+        },
+      }}
       {...(selectedTab === "2" && { footer: false })}
     >
       <Form layout="vertical" ref={formRef} onFinish={onFinish}>
