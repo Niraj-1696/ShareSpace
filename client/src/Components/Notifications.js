@@ -1,5 +1,6 @@
 import { Modal } from "antd";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function Notifications({
   notifications = [],
@@ -7,6 +8,7 @@ function Notifications({
   showNotifications,
   setShowNotifications,
 }) {
+  const navigate = useNavigate();
   return (
     <Modal
       title="Notifications"
@@ -23,7 +25,8 @@ function Notifications({
               key={notification._id}
               className="flex flex-col gap-1 border border-solid p-2 cursor-pointer"
               onClick={() => {
-                // Handle notification click
+                navigate(notification.onClick);
+                setShowNotifications(false);
               }}
             >
               <div className="flex justify-between items-center">
