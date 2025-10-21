@@ -5,6 +5,8 @@ const cloudinary = require("../config/cloudinaryConfig");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
+const Notification = require("../models/notificationModel");
+const User = require("../models/usermodel");
 
 // Ensure uploads folder exists
 const uploadDir = path.join(__dirname, "../uploads");
@@ -58,6 +60,19 @@ router.post("/add-product", authMiddleware, async (req, res) => {
     });
 
     await newProduct.save();
+
+    // Send Notification to admin
+    const admins = await User.find({ role: "admin" });
+    admins.forEach((admin) => {
+      const newNotification = new Notification({
+        user: admin._id,
+        message: `A new product has been added: ${req.user.name}`,
+        title: "New Product Added",
+        onClick: `/admin`,
+        read: false,
+      });
+      newNotification.save();
+    });
 
     res.status(200).json({
       success: true,
@@ -234,6 +249,16 @@ router.put("/update-product-status/:id", authMiddleware, async (req, res) => {
       { status },
       { new: true } // return updated document
     );
+
+    // Send Notification to seller about status update
+    const newNotification = new Notification({
+      user: product.seller,
+      title: "Product Status Updated",
+      message: `Your product "${product.name}" has been "${status}".`,
+      onClick: `/profile`,
+      read: false,
+    });
+    await newNotification.save();
 
     res.status(200).json({
       success: true,

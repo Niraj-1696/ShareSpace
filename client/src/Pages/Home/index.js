@@ -140,7 +140,7 @@ function Home() {
                     {product.age > 1 ? " Years" : " Year"} Old
                   </p>
                   <Divider className="my-1" />
-                  <span className="text-xl font-bold text-gray-800">
+                  <span className="text-xl font-bold text-green-500">
                     ₹ {product.price}
                   </span>
                 </div>
