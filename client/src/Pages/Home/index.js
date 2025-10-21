@@ -136,7 +136,8 @@ function Home() {
                     {product.name}
                   </h1>
                   <p className="text-sm text-gray-600 line-clamp-2">
-                    {product.description}
+                    {product.age}
+                    {product.age > 1 ? " Years" : " Year"} Old
                   </p>
                   <Divider className="my-1" />
                   <span className="text-xl font-bold text-gray-800">

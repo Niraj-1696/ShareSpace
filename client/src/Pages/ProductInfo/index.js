@@ -112,7 +112,8 @@ function ProductInfo() {
                 <span>Purchased Year</span>
                 <span>
                   {moment().subtract(product.age, "years").format("YYYY")} (
-                  {product.age} year old)
+                  {product.age}
+                  {product.age > 1 ? " Years" : " Year"} Old)
                 </span>
               </div>
             </div>
