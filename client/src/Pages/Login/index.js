@@ -43,7 +43,7 @@ function Login() {
     <div className="h-screen bg-primary flex justify-center items-center">
       <div className="bg-white p-5 rounded w-[450px]">
         <h1 className="text-primary text-2xl">
-          SHSP - <span className="text-gray-400">Login</span>
+          SHSP - <span className="text-gray-400 text-2xl ">LOGIN</span>
         </h1>
         <Divider />
         <Form layout="vertical" onFinish={onFinish}>

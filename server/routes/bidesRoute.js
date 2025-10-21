@@ -29,7 +29,8 @@ router.post("/get-all-bids", authMiddleware, async (req, res) => {
     const bids = await Bid.find(filter)
       .populate("product")
       .populate("buyer")
-      .populate("seller");
+      .populate("seller")
+      .sort({ createdAt: -1 });
     res.send({
       success: true,
       data: bids,
