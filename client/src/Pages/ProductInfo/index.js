@@ -134,19 +134,20 @@ function ProductInfo() {
               </div>
             </div>
             <Divider />
-            {product.showBidsOnProductPage !== false && (
-              <div className="flex flex-col">
-                <div className="flex justify-between">
-                  <h1 className="text-2xl font-semibold text-orange-900">
-                    Bids
-                  </h1>
-                  <Button
-                    onClick={() => setShowAddNewBid(!showAddNewBid)}
-                    disabled={user._id === product.seller._id}
-                  >
-                    New Bid
-                  </Button>
-                </div>
+            {/* Bids header and New Bid button should always be visible */}
+            <div className="flex flex-col">
+              <div className="flex justify-between">
+                <h1 className="text-2xl font-semibold text-orange-900">Bids</h1>
+                <Button
+                  onClick={() => setShowAddNewBid(!showAddNewBid)}
+                  disabled={user._id === product.seller._id}
+                >
+                  New Bid
+                </Button>
+              </div>
+
+              {/* Only show the bids list when seller enables it */}
+              {product.showBidsOnProductPage !== false && (
                 <div className="flex flex-col gap-3 mt-3">
                   {product.bids && product.bids.length > 0 ? (
                     product.bids.map((bid) => {
@@ -182,8 +183,8 @@ function ProductInfo() {
                     </div>
                   )}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
         {showAddNewBid && (

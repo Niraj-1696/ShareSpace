@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { PlaceNewBid } from "../../apicalls/products";
 import { Setloader } from "../../Redux/loadersSlice";
 import { message } from "antd";
+import { AddNotification } from "../../apicalls/notifications";
 function BidModal({ showBidModal, setShowBidModal, product, reloadData }) {
   const formref = React.useRef(null);
   const rules = [{ required: true, message: "Required" }];
@@ -21,6 +22,17 @@ function BidModal({ showBidModal, setShowBidModal, product, reloadData }) {
       dispatch(Setloader(false));
       if (response.success) {
         message.success("Bid placed successfully");
+
+        // send notification to seller
+        await AddNotification({
+          title: "A new bid has been placed",
+          message: `A new bid of ₹${values.bidAmount} has been placed on your product "${product.name}" by ${user.name}.`,
+          user: product.seller._id,
+          onClick: `/profile`,
+          read: false,
+        });
+        // Let app know a new notification has been created for someone
+        window.dispatchEvent(new CustomEvent("notification-updated"));
         setShowBidModal(false);
         reloadData();
       } else {

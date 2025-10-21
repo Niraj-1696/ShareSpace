@@ -60,10 +60,10 @@ function ProductsForm({
 
       if (response.success) {
         message.success(response.message);
-        // Only switch to Images tab when editing an existing product
-        // For new products, remain on General tab to avoid rendering Images with null product
-        if (selectedProduct) setSelectedTab("2");
-        getData();
+        // Refresh list and close the modal per requirement
+        await getData();
+        setSelectedTab("1");
+        setShowProductForm(false);
       } else {
         message.error(response.message);
       }

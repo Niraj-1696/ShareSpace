@@ -33,10 +33,12 @@ function Images({ selectedProduct, setShowProductForm, getData }) {
         message.success(response.message);
         setImages([...images, response.data]);
         setShowPreview(false);
-        getData();
+        await getData();
         // clear current selection so next upload doesn't reuse previous file
         setFile(null);
         setFileList([]);
+        // Close the product form after successful upload per requirement
+        setShowProductForm(false);
       } else {
         message.error(response.message || "Upload failed");
       }

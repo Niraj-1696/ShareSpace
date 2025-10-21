@@ -29,7 +29,7 @@ export const GetAllNotifications = async () => {
 export const DeleteNotification = async (id) => {
   try {
     const response = await axiosInstance.delete(
-      `/api/notifications/delete/${id}`
+      `/api/notifications/delete-notification/${id}`
     );
     return response.data;
   } catch (error) {

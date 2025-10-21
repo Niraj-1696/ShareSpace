@@ -28,7 +28,7 @@ function Notifications({
             >
               <div className="flex justify-between items-center">
                 <div>
-                  <h1 className="text-gray-700">{notification.tittle}</h1>
+                  <h1 className="text-gray-700">{notification.title}</h1>
                   <p className="text-gray-600 text-sm">
                     {notification.message}
                   </p>

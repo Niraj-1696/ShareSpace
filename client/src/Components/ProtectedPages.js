@@ -7,6 +7,11 @@ import { Setloader } from "../Redux/loadersSlice";
 import { SetUser } from "../Redux/usersSlice";
 import { Avatar, Badge } from "antd";
 import Notifications from "../Components/Notifications";
+import {
+  GetAllNotifications,
+  ReadAllNotifications,
+} from "../apicalls/notifications";
+import ReactRef from "react";
 
 function ProtectedPages({ children }) {
   const [notifications = [], setNotifications] = useState([]);
@@ -41,6 +46,50 @@ function ProtectedPages({ children }) {
       navigate("/login");
     }
   }, []);
+
+  // Load notifications when user changes or when modal is opened
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      if (!user?._id) return;
+      try {
+        const res = await GetAllNotifications();
+        if (res?.success) {
+          setNotifications(res.data || []);
+        }
+      } catch (e) {
+        // no-op
+      }
+    };
+    fetchNotifications();
+  }, [user?._id, showNotifications]);
+
+  // Refresh notifications when other parts of the app report updates
+  useEffect(() => {
+    const handler = async () => {
+      if (!user?._id) return;
+      const res = await GetAllNotifications();
+      if (res?.success) setNotifications(res.data || []);
+    };
+    window.addEventListener("notification-updated", handler);
+    return () => window.removeEventListener("notification-updated", handler);
+  }, [user?._id]);
+
+  // Mark all as read only when modal transitions from open -> closed
+  const prevShowRef = React.useRef(false);
+  useEffect(() => {
+    const wasOpen = prevShowRef.current;
+    if (wasOpen && !showNotifications && user?._id) {
+      (async () => {
+        try {
+          await ReadAllNotifications();
+          setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+        } catch (e) {
+          // ignore
+        }
+      })();
+    }
+    prevShowRef.current = showNotifications;
+  }, [showNotifications, user?._id]);
 
   return (
     user && (
