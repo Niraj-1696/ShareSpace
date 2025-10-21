@@ -11,8 +11,10 @@ function Home() {
   const [filters, setFilters] = React.useState({
     status: "approved",
   });
-  const { user } = useSelector((state) => state.users);
+  const [searchText, setSearchText] = React.useState("");
+  const [allProducts, setAllProducts] = React.useState([]);
   const [products, setProducts] = React.useState([]);
+  const { user } = useSelector((state) => state.users);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const getData = async () => {
@@ -26,6 +28,7 @@ function Home() {
       const response = await GetProducts(payload);
       dispatch(Setloader(false));
       if (response.success) {
+        setAllProducts(response.data);
         setProducts(response.data);
       }
     } catch (error) {
@@ -33,6 +36,38 @@ function Home() {
       message.error(error.message);
     }
   };
+
+  // Search filter function
+  const filterProducts = React.useCallback(
+    (searchValue) => {
+      if (!searchValue.trim()) {
+        setProducts(allProducts);
+        return;
+      }
+
+      const searchLower = searchValue.toLowerCase();
+      const filtered = allProducts.filter((product) => {
+        const nameMatch = product.name.toLowerCase().includes(searchLower);
+        const descMatch = product.description
+          .toLowerCase()
+          .includes(searchLower);
+        const priceMatch = product.price.toString().includes(searchValue);
+        return nameMatch || descMatch || priceMatch;
+      });
+      setProducts(filtered);
+    },
+    [allProducts]
+  );
+
+  // Debounced search effect
+  React.useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      filterProducts(searchText);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchText, filterProducts]);
+
   React.useEffect(() => {
     getData();
   }, [JSON.stringify(filters)]);
@@ -57,12 +92,29 @@ function Home() {
                 title="Show filters"
               />
             )}
-            <input
-              type="text"
-              placeholder="Search products..."
-              className="border border-gray-300 rounded border-solid px-2 py-1 h-14"
-            />
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                placeholder="Search products by name, description, or price..."
+                className="border border-gray-300 rounded border-solid px-4 py-3 h-14 w-full pr-10"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+              />
+              {searchText && (
+                <i
+                  className="ri-close-circle-line absolute right-3 top-4 text-2xl text-gray-400 cursor-pointer hover:text-gray-600"
+                  onClick={() => setSearchText("")}
+                  title="Clear search"
+                />
+              )}
+            </div>
           </div>
+          {searchText && (
+            <div className="text-sm text-gray-600">
+              Found {products.length} product{products.length !== 1 ? "s" : ""}
+              {searchText && ` matching "${searchText}"`}
+            </div>
+          )}
           <div className="grid gap-5 grid-cols-4">
             {products?.map((product) => (
               <div
