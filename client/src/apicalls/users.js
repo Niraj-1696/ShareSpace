@@ -24,7 +24,6 @@ export const LoginUser = async (payload) => {
   return response.data;
 };
 
-// get current user
 export const ForgotPassword = async (email) => {
   try {
     const response = await axiosInstance.post("/api/users/forgot-password", {
@@ -54,6 +53,7 @@ export const ResetPassword = async (token, password) => {
   }
 };
 
+// get current user
 export const GetCurrentUser = async () => {
   try {
     const response = await axiosInstance.get("/api/users/get-current-user", {
