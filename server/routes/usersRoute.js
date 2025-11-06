@@ -130,9 +130,29 @@ router.post("/login", async (req, res) => {
 router.post("/forgot-password", async (req, res) => {
   try {
     const { email } = req.body;
-    const user = await User.findOne({ email });
+
+    // Validate email input
+    if (!email || !email.trim()) {
+      return res.send({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    const user = await User.findOne({ email: email.trim().toLowerCase() });
     if (!user) {
-      throw new Error("User not found");
+      return res.send({
+        success: false,
+        message: "No account found with this email address",
+      });
+    }
+
+    // Check if user is active
+    if (user.status !== "active") {
+      return res.send({
+        success: false,
+        message: "Account is not active. Please contact admin.",
+      });
     }
 
     // Generate reset token
@@ -156,17 +176,33 @@ router.post("/forgot-password", async (req, res) => {
       },
     });
 
-    // Send reset email
-    const resetUrl = `${req.protocol}://${req.get(
-      "host"
-    )}/reset-password/${resetToken}`;
+    // Send reset email - Fixed to point to frontend URL
+    const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: user.email,
-      subject: "Password Reset Request",
-      text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
+      subject: "ShareSpace - Password Reset Request",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #405138;">ShareSpace - Password Reset</h2>
+          <p>Hello ${user.name},</p>
+          <p>You are receiving this because you (or someone else) have requested a password reset for your ShareSpace account.</p>
+          <p>Please click on the following button to reset your password:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${resetUrl}" style="background-color: #405138; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">Reset Password</a>
+          </div>
+          <p>Or copy and paste this link into your browser:</p>
+          <p style="word-break: break-all; color: #405138;">${resetUrl}</p>
+          <p><strong>This link will expire in 1 hour.</strong></p>
+          <p>If you did not request this password reset, please ignore this email and your password will remain unchanged.</p>
+          <hr style="margin: 30px 0; border: 1px solid #eee;">
+          <p style="color: #666; font-size: 12px;">This email was sent from ShareSpace Campus Marketplace</p>
+        </div>
+      `,
+      text: `You are receiving this because you (or someone else) have requested the reset of the password for your ShareSpace account.\n\n
         Please click on the following link, or paste this into your browser to complete the process:\n\n
         ${resetUrl}\n\n
+        This link will expire in 1 hour.\n\n
         If you did not request this, please ignore this email and your password will remain unchanged.\n`,
     };
 
@@ -174,12 +210,14 @@ router.post("/forgot-password", async (req, res) => {
 
     res.send({
       success: true,
-      message: "Password reset email sent",
+      message:
+        "If an account with this email exists, you will receive a password reset link shortly.",
     });
   } catch (error) {
+    console.error("Forgot password error:", error);
     res.send({
       success: false,
-      message: error.message,
+      message: "Failed to process password reset request. Please try again.",
     });
   }
 });
@@ -187,35 +225,56 @@ router.post("/forgot-password", async (req, res) => {
 // reset password
 router.post("/reset-password/:token", async (req, res) => {
   try {
+    const { password } = req.body;
+
+    // Validate password input
+    if (!password || password.length < 6) {
+      return res.send({
+        success: false,
+        message: "Password must be at least 6 characters long",
+      });
+    }
+
+    // Hash the token from URL parameter
     const resetPasswordToken = crypto
       .createHash("sha256")
       .update(req.params.token)
       .digest("hex");
 
+    // Find user with valid reset token
     const user = await User.findOne({
       resetPasswordToken,
       resetPasswordExpires: { $gt: Date.now() },
     });
 
     if (!user) {
-      throw new Error("Invalid or expired reset token");
+      return res.send({
+        success: false,
+        message:
+          "Invalid or expired reset token. Please request a new password reset.",
+      });
     }
 
     // Set new password
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(req.body.password, salt);
+    user.password = await bcrypt.hash(password, salt);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
     await user.save();
 
+    console.log(`Password successfully reset for user: ${user.email}`);
+
     res.send({
       success: true,
-      message: "Password reset successful",
+      message:
+        "Password reset successful! You can now login with your new password.",
     });
   } catch (error) {
+    console.error("Reset password error:", error);
     res.send({
       success: false,
-      message: error.message,
+      message:
+        "Failed to reset password. Please try again or request a new reset link.",
     });
   }
 });

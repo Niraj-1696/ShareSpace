@@ -3,8 +3,9 @@ require("dotenv").config(); // ✅ To load .env variables
 
 mongoose
   .connect(process.env.MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+    ssl: true,
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
   })
   .then(() => console.log("✅ MongoDB Connected Successfully"))
   .catch((error) =>

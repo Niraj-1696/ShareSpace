@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, Input, Button, Divider, App as AntdApp } from "antd";
+import { Form, Input, Button, Divider, App as AntdApp, Alert } from "antd";
 import { Link } from "react-router-dom";
 import { ForgotPassword as ForgotPasswordAPI } from "../../apicalls/users";
 import { useDispatch } from "react-redux";
@@ -15,30 +15,80 @@ const rules = [
 function ForgotPassword() {
   const { message } = AntdApp.useApp();
   const dispatch = useDispatch();
+  const [emailSent, setEmailSent] = React.useState(false);
+  const [emailAddress, setEmailAddress] = React.useState("");
 
   const onFinish = async (values) => {
     try {
       dispatch(Setloader(true));
       const response = await ForgotPasswordAPI(values.email);
       dispatch(Setloader(false));
+
       if (response.success) {
-        message.success(response.message);
+        setEmailSent(true);
+        setEmailAddress(values.email);
+        message.success("Password reset email sent! Please check your inbox.");
       } else {
-        throw new Error(response.message);
+        throw new Error(response.message || "Failed to send reset email");
       }
     } catch (error) {
       dispatch(Setloader(false));
-      message.error(error.message);
+      message.error(
+        error.message || "Failed to send reset email. Please try again."
+      );
     }
   };
+
+  if (emailSent) {
+    return (
+      <div className="h-screen bg-primary flex justify-center items-center">
+        <div className="bg-white p-5 rounded w-[450px]">
+          <h1 className="text-primary text-2xl">
+            ShareSpace - <span className="text-gray-400">Email Sent!</span>
+          </h1>
+          <Divider />
+          <Alert
+            message="Check Your Email"
+            description={`We've sent a password reset link to ${emailAddress}. Please check your inbox and click the link to reset your password. The link will expire in 1 hour.`}
+            type="success"
+            showIcon
+            className="mb-4"
+          />
+          <div className="mt-5 text-center space-y-2">
+            <div>
+              <Button
+                type="link"
+                onClick={() => setEmailSent(false)}
+                className="text-primary hover:text-blue-600"
+              >
+                Send Another Email
+              </Button>
+            </div>
+            <div>
+              <Link to="/login" className="text-primary hover:text-blue-600">
+                Back to Login
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen bg-primary flex justify-center items-center">
       <div className="bg-white p-5 rounded w-[450px]">
         <h1 className="text-primary text-2xl">
-          SHSP - <span className="text-gray-400">Forgot Password</span>
+          ShareSpace - <span className="text-gray-400">Forgot Password</span>
         </h1>
         <Divider />
+        <Alert
+          message="Reset Your Password"
+          description="Enter your email address and we'll send you a link to reset your password."
+          type="info"
+          showIcon
+          className="mb-4"
+        />
         <Form layout="vertical" onFinish={onFinish}>
           <Form.Item
             label="Email"

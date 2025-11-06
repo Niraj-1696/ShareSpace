@@ -31,9 +31,13 @@ export const ForgotPassword = async (email) => {
     });
     return response.data;
   } catch (error) {
+    console.error("ForgotPassword API Error:", error);
     return {
       success: false,
-      message: error.response?.data?.message || "Something went wrong",
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to send reset email",
     };
   }
 };
@@ -46,9 +50,13 @@ export const ResetPassword = async (token, password) => {
     );
     return response.data;
   } catch (error) {
+    console.error("ResetPassword API Error:", error);
     return {
       success: false,
-      message: error.response?.data?.message || "Something went wrong",
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to reset password",
     };
   }
 };
