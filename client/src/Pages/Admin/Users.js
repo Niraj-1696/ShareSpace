@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Button, message, Table, Image, Modal } from "antd";
+import { Button, message, Table, Image, Modal, Popconfirm } from "antd";
 import { Setloader } from "../../Redux/loadersSlice";
 import { useDispatch } from "react-redux";
 import moment from "moment";
-import { GetAllUsers, UpdateUserStatus } from "../../apicalls/users";
+import {
+  GetAllUsers,
+  UpdateUserStatus,
+  DeleteUser,
+} from "../../apicalls/users";
 function Users() {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -36,6 +40,23 @@ function Users() {
     try {
       dispatch(Setloader(true));
       const response = await UpdateUserStatus(id, statusData);
+      dispatch(Setloader(false));
+      if (response.success) {
+        message.success(response.message);
+        getData(); // Refresh the users list
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      dispatch(Setloader(false));
+      message.error(error.message);
+    }
+  };
+
+  const onDeleteUser = async (id, userName) => {
+    try {
+      dispatch(Setloader(true));
+      const response = await DeleteUser(id);
       dispatch(Setloader(false));
       if (response.success) {
         message.success(response.message);
@@ -101,9 +122,9 @@ function Users() {
       title: "Action",
       dataIndex: "action",
       render: (text, record) => {
-        const { status, _id } = record;
+        const { status, _id, role, name } = record;
         return (
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
             {status === "pending" && (
               <>
                 <span
@@ -141,6 +162,21 @@ function Users() {
               >
                 Unblock
               </span>
+            )}
+            {/* Delete button - only for non-admin users */}
+            {role !== "admin" && (
+              <Popconfirm
+                title={`Delete User: ${name}`}
+                description={`Are you sure you want to permanently delete "${name}"? This action cannot be undone.`}
+                onConfirm={() => onDeleteUser(_id, name)}
+                okText="Yes, Delete"
+                cancelText="Cancel"
+                okType="danger"
+              >
+                <span className="underline cursor-pointer text-red-600 hover:text-red-800">
+                  Delete
+                </span>
+              </Popconfirm>
             )}
           </div>
         );

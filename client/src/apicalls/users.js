@@ -115,3 +115,16 @@ export const UpdateUserRole = async (id, status) => {
     return { success: false, message: error.message };
   }
 };
+
+// delete user (admin only)
+export const DeleteUser = async (id) => {
+  try {
+    const response = await axiosInstance.delete(`/api/users/delete-user/${id}`);
+    return response.data;
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || error.message,
+    };
+  }
+};

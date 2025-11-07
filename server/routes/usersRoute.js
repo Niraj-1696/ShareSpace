@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/usermodel");
-const Notification = require("../models/notificationModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middlwares/authMiddleware");
@@ -77,35 +76,6 @@ router.post("/register", upload.single("collegeIdImage"), async (req, res) => {
       status: "pending",
     });
     await newUser.save();
-
-    // Send Notification to all admins about new user registration
-    try {
-      const admins = await User.find({ role: "admin" });
-      console.log(`🔍 Found ${admins.length} admin users for notification`);
-      
-      if (admins.length > 0) {
-        const notificationPromises = admins.map(async (admin) => {
-          const newNotification = new Notification({
-            user: admin._id,
-            message: `New user registration: ${name} (${email}) with PSID: ${psid} and Roll No: ${rollNo.trim()} is awaiting approval. Click to review.`,
-            title: "New Registration Pending",
-            onClick: `/admin`,
-            read: false,
-          });
-          console.log(`📧 Creating notification for admin: ${admin.name} (${admin.email})`);
-          return await newNotification.save();
-        });
-        
-        // Wait for all notifications to be saved
-        await Promise.all(notificationPromises);
-        console.log(`✅ Successfully created ${admins.length} admin notifications`);
-      } else {
-        console.log("⚠️ No admin users found - no notifications sent");
-      }
-    } catch (notificationError) {
-      console.error("❌ Error creating admin notifications:", notificationError);
-      // Don't fail the registration if notification fails
-    }
 
     res.send({
       success: true,
@@ -358,30 +328,6 @@ router.get("/get-users", authMiddleware, async (req, res) => {
   }
 });
 
-// Debug endpoint to check admin users and notifications
-router.get("/debug/admin-status", async (req, res) => {
-  try {
-    const admins = await User.find({ role: "admin" }).select('name email role status');
-    const adminNotifications = await Notification.find({
-      user: { $in: admins.map(a => a._id) }
-    }).sort({ createdAt: -1 }).limit(10).populate('user', 'name email');
-    
-    res.send({
-      success: true,
-      data: {
-        adminCount: admins.length,
-        admins: admins,
-        recentNotifications: adminNotifications
-      }
-    });
-  } catch (error) {
-    res.send({
-      success: false,
-      message: error.message,
-    });
-  }
-});
-
 // update user status
 router.put("/update-user-status/:id", authMiddleware, async (req, res) => {
   try {
@@ -392,6 +338,62 @@ router.put("/update-user-status/:id", authMiddleware, async (req, res) => {
     });
   } catch (error) {
     res.send({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// delete user (admin only)
+router.delete("/delete-user/:id", authMiddleware, async (req, res) => {
+  try {
+    const currentUser = await User.findById(req.userId);
+
+    // Check if current user is admin
+    if (currentUser.role !== "admin") {
+      return res.status(403).send({
+        success: false,
+        message: "Only admin users can delete accounts",
+      });
+    }
+
+    const userToDelete = await User.findById(req.params.id);
+    if (!userToDelete) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Prevent admin from deleting themselves
+    if (req.params.id === req.userId) {
+      return res.status(400).send({
+        success: false,
+        message: "You cannot delete your own account",
+      });
+    }
+
+    // Prevent deleting other admin users
+    if (userToDelete.role === "admin") {
+      return res.status(400).send({
+        success: false,
+        message: "Cannot delete other admin users",
+      });
+    }
+
+    await User.findByIdAndDelete(req.params.id);
+
+    console.log(
+      `👤 User deleted by admin: ${userToDelete.name} (${userToDelete.email})`
+    );
+
+    res.send({
+      success: true,
+      message: `User "${userToDelete.name}" has been successfully deleted`,
+    });
+  } catch (error) {
+    console.error("❌ Error deleting user:", error);
+    res.status(500).send({
       success: false,
       message: error.message,
     });
