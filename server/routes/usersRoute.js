@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/usermodel");
+const Notification = require("../models/notificationModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middlwares/authMiddleware");
@@ -77,6 +78,27 @@ router.post("/register", upload.single("collegeIdImage"), async (req, res) => {
     });
     await newUser.save();
 
+    // Create notifications for all admin users
+    try {
+      const adminUsers = await User.find({ role: "admin" });
+
+      const notificationPromises = adminUsers.map((admin) => {
+        const notification = new Notification({
+          title: "New User Registration",
+          message: `${name} (PSID: ${psid}, Roll No: ${rollNo.trim()}) has registered and is awaiting approval.`,
+          onClick: "/admin",
+          user: admin._id,
+          read: false,
+        });
+        return notification.save();
+      });
+
+      await Promise.all(notificationPromises);
+    } catch (notificationError) {
+      console.error("Error creating admin notifications:", notificationError);
+      // Don't fail the registration if notification creation fails
+    }
+
     res.send({
       success: true,
       message: "User created successfully. Awaiting admin approval.",
@@ -98,9 +120,19 @@ router.post("/login", async (req, res) => {
       throw new Error("User not found");
     }
 
-    // Check if user is blocked
-    if (user.status !== "active") {
-      throw new Error("User is blocked , please contact admin");
+    // Check user status
+    if (user.status === "pending") {
+      throw new Error(
+        "Your registration is pending admin approval. Please wait for approval before logging in."
+      );
+    } else if (user.status === "blocked") {
+      throw new Error(
+        "Your account has been blocked. Please contact admin for assistance."
+      );
+    } else if (user.status !== "active") {
+      throw new Error(
+        "Account access restricted. Please contact admin for assistance."
+      );
     }
 
     // Compare password
@@ -331,10 +363,47 @@ router.get("/get-users", authMiddleware, async (req, res) => {
 // update user status
 router.put("/update-user-status/:id", authMiddleware, async (req, res) => {
   try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.send({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const oldStatus = user.status;
     await User.findByIdAndUpdate(req.params.id, req.body);
+
+    // Create notification for user when status changes from pending
+    if (oldStatus === "pending" && req.body.status) {
+      try {
+        let notificationMessage = "";
+        if (req.body.status === "active") {
+          notificationMessage =
+            "Congratulations! Your registration has been approved by the admin. You can now access all features.";
+        } else if (req.body.status === "blocked") {
+          notificationMessage =
+            "Your registration has been rejected by the admin. Please contact support for more information.";
+        }
+
+        if (notificationMessage) {
+          const notification = new Notification({
+            title: "Registration Status Update",
+            message: notificationMessage,
+            onClick: "/profile",
+            user: user._id,
+            read: false,
+          });
+          await notification.save();
+        }
+      } catch (notificationError) {
+        console.error("Error creating user notification:", notificationError);
+      }
+    }
+
     res.send({
       success: true,
-      message: "User status updated",
+      message: "User status updated successfully",
     });
   } catch (error) {
     res.send({
