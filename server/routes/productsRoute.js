@@ -61,18 +61,54 @@ router.post("/add-product", authMiddleware, async (req, res) => {
 
     await newProduct.save();
 
+    // Get user details for notification
+    const currentUser = await User.findById(req.userId);
+
     // Send Notification to admin
     const admins = await User.find({ role: "admin" });
-    admins.forEach((admin) => {
-      const newNotification = new Notification({
-        user: admin._id,
-        message: `A new product has been added: ${req.user.name}`,
-        title: "New Product Added",
-        onClick: `/admin`,
-        read: false,
-      });
-      newNotification.save();
+    console.log(
+      `📧 Found ${admins.length} admin(s) to notify about new product: ${name}`
+    );
+
+    // Create notifications for all admins
+    const notificationPromises = admins.map(async (admin) => {
+      try {
+        const newNotification = new Notification({
+          user: admin._id,
+          message: `A new product "${name}" has been added by ${
+            currentUser ? currentUser.name : "Unknown User"
+          } and is waiting for approval`,
+          title: "New Product Added",
+          onClick: `/admin`,
+          read: false,
+        });
+        const savedNotification = await newNotification.save();
+        console.log(
+          `✅ Notification sent to admin: ${admin.name} (${admin.email})`
+        );
+        return savedNotification;
+      } catch (notifError) {
+        console.error(
+          `❌ Failed to send notification to admin ${admin.email}:`,
+          notifError.message
+        );
+        throw notifError;
+      }
     });
+
+    // Wait for all notifications to be saved
+    try {
+      await Promise.all(notificationPromises);
+      console.log(
+        `✅ All admin notifications sent successfully for product: ${name}`
+      );
+    } catch (notifError) {
+      console.error(
+        `❌ Error sending admin notifications:`,
+        notifError.message
+      );
+      // Don't fail the product creation if notifications fail
+    }
 
     res.status(200).json({
       success: true,
