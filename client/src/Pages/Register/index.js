@@ -18,7 +18,6 @@ function Register() {
   const dispatch = useDispatch();
   const [imageFile, setImageFile] = useState(null);
   const [psid, setPsid] = useState("");
-  const [rollNo, setRollNo] = useState("");
   const [ocrLoading, setOcrLoading] = useState(false);
 
   // Clean, single async onImageChange function
@@ -26,7 +25,6 @@ function Register() {
     if (info.file.status === "removed") {
       setImageFile(null);
       setPsid("");
-      setRollNo("");
       return;
     }
     let file =
@@ -43,18 +41,13 @@ function Register() {
       const result = await Tesseract.recognize(file, "eng");
       const text = result.data.text;
       const psidMatch = text.match(/PSID[:\s]*([0-9]+)/i);
-      const rollNoMatch = text.match(/ROLL\s*NO[:\s]*([0-9]+)/i);
       setPsid(psidMatch ? psidMatch[1] : "");
-      setRollNo(rollNoMatch ? rollNoMatch[1] : "");
-      if (!psidMatch || !rollNoMatch) {
-        message.error(
-          "Could not extract PSID or Roll No. Please upload a clear image."
-        );
+      if (!psidMatch) {
+        message.error("Could not extract PSID. Please upload a clear image.");
       }
     } catch (err) {
       message.error("OCR failed. Try again with a clearer image.");
       setPsid("");
-      setRollNo("");
     }
     setOcrLoading(false);
   };
@@ -62,7 +55,6 @@ function Register() {
   const onReset = () => {
     setImageFile(null);
     setPsid("");
-    setRollNo("");
   };
 
   const onFinish = async (values) => {
@@ -70,8 +62,12 @@ function Register() {
       message.error("Please upload your college ID image.");
       return;
     }
-    if (!psid || !rollNo) {
-      message.error("PSID and Roll No must be extracted from image.");
+    if (!psid) {
+      message.error("PSID must be extracted from image.");
+      return;
+    }
+    if (!values.rollNo) {
+      message.error("Please enter your Roll No.");
       return;
     }
     try {
@@ -80,8 +76,9 @@ function Register() {
       formData.append("name", values.name);
       formData.append("email", values.email);
       formData.append("password", values.password);
+      formData.append("rollNo", values.rollNo);
       formData.append("collegeIdImage", imageFile);
-      // PSID and Roll No will be extracted server-side as well for validation
+      // PSID will be extracted server-side as well for validation
       const response = await RegisterUser(formData, true); // true: multipart
       dispatch(Setloader(false));
       if (response.success) {
@@ -166,13 +163,8 @@ function Register() {
               className="rounded-lg"
             />
           </Form.Item>
-          <Form.Item label="Roll No" required>
-            <Input
-              value={rollNo}
-              disabled
-              placeholder="Extracted from image"
-              className="rounded-lg"
-            />
+          <Form.Item label="Roll No" name="rollNo" rules={rules}>
+            <Input placeholder="Enter your Roll No" className="rounded-lg" />
           </Form.Item>
           <Button
             type="primary"

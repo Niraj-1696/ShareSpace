@@ -18,7 +18,13 @@ const upload = multer({ storage });
 router.post("/register", upload.single("collegeIdImage"), async (req, res) => {
   try {
     // Check for duplicate email, psid, rollNo
-    const { name, email, password } = req.body;
+    const { name, email, password, rollNo } = req.body;
+
+    // Validate rollNo input
+    if (!rollNo || !rollNo.trim()) {
+      throw new Error("Roll No is required");
+    }
+
     // Image file
     const file = req.file;
     if (!file) {
@@ -38,20 +44,18 @@ router.post("/register", upload.single("collegeIdImage"), async (req, res) => {
     const ocrResult = await Tesseract.recognize(file.buffer, "eng");
     const text = ocrResult.data.text;
 
-    // Extract PSID and Roll No using regex
+    // Extract only PSID using regex
     const psidMatch = text.match(/PSID[:\s]*([0-9]+)/i);
-    const rollNoMatch = text.match(/ROLL\s*NO[:\s]*([0-9]+)/i);
     const psid = psidMatch ? psidMatch[1] : null;
-    const rollNo = rollNoMatch ? rollNoMatch[1] : null;
-    if (!psid || !rollNo) {
+    if (!psid) {
       throw new Error(
-        "Could not extract PSID or Roll No from image. Please upload a clear image."
+        "Could not extract PSID from image. Please upload a clear image."
       );
     }
 
     // Check for duplicate PSID or Roll No
     const existingUser = await User.findOne({
-      $or: [{ email }, { psid }, { rollNo }],
+      $or: [{ email }, { psid }, { rollNo: rollNo.trim() }],
     });
     if (existingUser) {
       throw new Error("User with this email, PSID, or Roll No already exists");
@@ -67,7 +71,7 @@ router.post("/register", upload.single("collegeIdImage"), async (req, res) => {
       email,
       password: hashedPassword,
       psid,
-      rollNo,
+      rollNo: rollNo.trim(),
       collegeIdImage: uploadResult.secure_url,
       status: "pending",
     });
