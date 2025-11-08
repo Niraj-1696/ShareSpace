@@ -78,6 +78,15 @@ function Products() {
     { title: "Age", dataIndex: "age" },
     { title: "Status", dataIndex: "status" },
     {
+      title: "Bids",
+      dataIndex: "bids",
+      render: (text, record) => (
+        <span className="font-medium">
+          {record.bidCount ?? record.bids?.length ?? 0}
+        </span>
+      ),
+    },
+    {
       title: "Added on",
       dataIndex: "createdAt",
       render: (text, record) =>

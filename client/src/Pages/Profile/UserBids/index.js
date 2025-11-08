@@ -53,7 +53,6 @@ function UserBids() {
       render: (text, record) => (
         <div>
           <p>{record.seller?.name}</p>
-          <p className="text-sm text-gray-500">{record.seller?.email}</p>
         </div>
       ),
     },
@@ -82,19 +81,45 @@ function UserBids() {
       ),
     },
     {
-      title: "Mobile",
-      dataIndex: "mobile",
+      title: "Status",
+      dataIndex: "status",
+      render: (text, record) => (
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-medium ${
+            (record.status || "pending") === "pending"
+              ? "bg-yellow-100 text-yellow-800"
+              : (record.status || "pending") === "accepted"
+              ? "bg-green-100 text-green-800"
+              : "bg-red-100 text-red-800"
+          }`}
+        >
+          {(record.status || "pending").toUpperCase()}
+        </span>
+      ),
     },
     {
       title: "Action",
       dataIndex: "action",
       render: (text, record) => (
-        <span
-          className="text-primary underline cursor-pointer hover:text-blue-600"
-          onClick={() => navigate(`/product/${record.product?._id}`)}
-        >
-          View Product
-        </span>
+        <div className="flex flex-col gap-1">
+          <span
+            className="text-primary underline cursor-pointer hover:text-blue-600 text-sm"
+            onClick={() => navigate(`/product/${record.product?._id}`)}
+          >
+            View Product
+          </span>
+          {record.status === "accepted" && (
+            <div className="text-xs">
+              <div className="font-medium text-green-600">✅ Accepted!</div>
+              <div className="text-gray-600">
+                <div>📧 Contact: {record.seller?.email}</div>
+              </div>
+            </div>
+          )}
+          {record.status === "rejected" && (
+            <div className="text-xs text-red-600 font-medium">❌ Rejected</div>
+          )}
+        </div>
       ),
     },
   ];

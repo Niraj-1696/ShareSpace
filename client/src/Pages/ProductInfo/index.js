@@ -1,7 +1,11 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { message, Button } from "antd";
-import { GetAllBids, GetProductById } from "../../apicalls/products";
+import {
+  GetAllBids,
+  GetProductById,
+  RespondToBid,
+} from "../../apicalls/products";
 import { Setloader } from "../../Redux/loadersSlice";
 import { useParams } from "react-router-dom";
 import moment from "moment";
@@ -27,6 +31,24 @@ function ProductInfo() {
     } catch (error) {
       dispatch(Setloader(false));
       message.error(error.message);
+    }
+  };
+
+  const handleBidResponse = async (bidId, action) => {
+    try {
+      dispatch(Setloader(true));
+      const response = await RespondToBid(bidId, action);
+      dispatch(Setloader(false));
+
+      if (response.success) {
+        message.success(response.message);
+        getData(); // Reload data to show updated bid status
+      } else {
+        message.error(response.message);
+      }
+    } catch (error) {
+      dispatch(Setloader(false));
+      message.error("Failed to respond to bid");
     }
   };
   React.useEffect(() => {
@@ -126,10 +148,6 @@ function ProductInfo() {
                 <span>Name</span>
                 <span>{product.seller.name}</span>
               </div>
-              <div className="flex justify-between mt-2">
-                <span>Email</span>
-                <span>{product.seller.email}</span>
-              </div>
             </div>
             <Divider />
             {/* Bids header and New Bid button should always be visible */}
@@ -138,11 +156,30 @@ function ProductInfo() {
                 <h1 className="text-2xl font-semibold text-orange-900">Bids</h1>
                 <Button
                   onClick={() => setShowAddNewBid(!showAddNewBid)}
-                  disabled={user._id === product.seller._id}
+                  disabled={
+                    user._id === product.seller._id ||
+                    product.bids?.some((bid) => bid.status === "accepted")
+                  }
+                  title={
+                    user._id === product.seller._id
+                      ? "You cannot bid on your own product"
+                      : product.bids?.some((bid) => bid.status === "accepted")
+                      ? "Bidding closed - A bid has been accepted"
+                      : "Place a new bid"
+                  }
                 >
                   New Bid
                 </Button>
               </div>
+
+              {/* Show bidding status */}
+              {product.bids?.some((bid) => bid.status === "accepted") && (
+                <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md">
+                  <span className="text-green-800 text-sm font-medium">
+                    🎉 Bidding Closed - A bid has been accepted for this product
+                  </span>
+                </div>
+              )}
 
               {/* Only show the bids list when seller enables it */}
               {product.showBidsOnProductPage !== false && (
@@ -162,9 +199,37 @@ function ProductInfo() {
                             <span className="font-semibold">Bid Amount:</span>
                             <span>₹ {bid.bidAmount}</span>
                           </div>
+                          {user._id === product.seller._id && (
+                            <div className="flex justify-between mt-2">
+                              <span className="font-semibold">Mobile:</span>
+                              <span className="text-sm">📱 {bid.mobile}</span>
+                            </div>
+                          )}
+                          {user._id === product.seller._id && (
+                            <div className="flex justify-between mt-2">
+                              <span className="font-semibold">Message:</span>
+                              <span className="text-sm">
+                                {bid.message || "No message provided"}
+                              </span>
+                            </div>
+                          )}
+                          <div className="flex justify-between mt-2">
+                            <span className="font-semibold">Status:</span>
+                            <span
+                              className={`px-2 py-1 rounded text-xs font-medium ${
+                                bid.status === "pending"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : bid.status === "accepted"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-800"
+                              }`}
+                            >
+                              {bid.status?.toUpperCase() || "PENDING"}
+                            </span>
+                          </div>
                           <div className="flex justify-between mt-2">
                             <span className="font-semibold">
-                              Bid Placed On :
+                              Bid Placed On:
                             </span>
                             <span>
                               {moment(bid.createdAt).format(
@@ -172,6 +237,32 @@ function ProductInfo() {
                               )}
                             </span>
                           </div>
+
+                          {/* Accept/Reject buttons for seller when bid is pending */}
+                          {user._id === product.seller._id &&
+                            bid.status === "pending" && (
+                              <div className="flex gap-2 mt-3">
+                                <Button
+                                  type="primary"
+                                  size="small"
+                                  className="bg-green-600 hover:bg-green-700"
+                                  onClick={() =>
+                                    handleBidResponse(bid._id, "accept")
+                                  }
+                                >
+                                  ✅ Accept
+                                </Button>
+                                <Button
+                                  danger
+                                  size="small"
+                                  onClick={() =>
+                                    handleBidResponse(bid._id, "reject")
+                                  }
+                                >
+                                  ❌ Reject
+                                </Button>
+                              </div>
+                            )}
                         </div>
                       );
                     })

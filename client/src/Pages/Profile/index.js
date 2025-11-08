@@ -1,15 +1,30 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Tabs } from "antd";
 import Products from "./Products";
 import UserBids from "./UserBids";
 import moment from "moment";
 import { useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 
 function Profile() {
   const { user } = useSelector((state) => state.users);
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState("1");
+
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "UserBids") {
+      setActiveTab("2");
+    } else if (tab === "Products") {
+      setActiveTab("1");
+    } else if (tab === "General") {
+      setActiveTab("3");
+    }
+  }, [searchParams]);
+
   return (
     <div>
-      <Tabs defaultActiveKey="1">
+      <Tabs activeKey={activeTab} onChange={setActiveTab}>
         <Tabs.TabPane tab="Products" key="1">
           <Products />
         </Tabs.TabPane>

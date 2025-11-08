@@ -25,6 +25,19 @@ const bidSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    status: {
+      type: String,
+      enum: ["pending", "accepted", "rejected"],
+      default: "pending",
+    },
+    respondedAt: {
+      type: Date,
+      default: null,
+    },
+    sellerResponse: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,

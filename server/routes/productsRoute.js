@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Product = require("../models/productModel");
+const Bid = require("../models/bidModel");
 const authMiddleware = require("../middlwares/authMiddleware");
 const cloudinary = require("../config/cloudinaryConfig");
 const multer = require("multer");
@@ -163,7 +164,20 @@ router.post("/get-products", async (req, res) => {
     const products = await Product.find(finalQuery)
       .populate("seller")
       .sort({ createdAt: -1, _id: -1 });
-    res.status(200).json({ success: true, data: products });
+
+    // Add bid counts to each product
+    const productsWithBids = await Promise.all(
+      products.map(async (product) => {
+        const bids = await Bid.find({ product: product._id });
+        return {
+          ...product.toObject(),
+          bids: bids,
+          bidCount: bids.length,
+        };
+      })
+    );
+
+    res.status(200).json({ success: true, data: productsWithBids });
   } catch (error) {
     console.error("❌ Error fetching products:", error);
     res.status(500).json({ success: false, message: error.message });

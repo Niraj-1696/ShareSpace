@@ -125,3 +125,19 @@ export const GetAllBids = async (filters = {}) => {
     return { success: false, message: error.message };
   }
 };
+
+// respond to a bid (accept/reject)
+export const RespondToBid = async (bidId, action, message = "") => {
+  try {
+    const response = await axiosInstance.put(
+      `/api/bids/respond-to-bid/${bidId}`,
+      { action, message }
+    );
+    return response.data;
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || error.message,
+    };
+  }
+};
