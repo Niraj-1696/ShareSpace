@@ -198,22 +198,23 @@ function ProductInfo() {
                           <span className="font-semibold">Bid Amount:</span>
                           <span>₹ {bid.bidAmount}</span>
                         </div>
-                        {user._id === product.seller._id && bid.status === "accepted" && (
-                          <div className="flex justify-between mt-2">
-                            <span className="font-semibold">Mobile:</span>
-                            <span className="text-sm">
-                              {bid.mobile}
-                            </span>
-                          </div>
-                        )}
+                        {user._id === product.seller._id &&
+                          bid.status === "accepted" && (
+                            <div className="flex justify-between mt-2">
+                              <span className="font-semibold">Mobile:</span>
+                              <span className="text-sm">{bid.mobile}</span>
+                            </div>
+                          )}
 
-                        {user._id === product.seller._id && bid.status === "pending" && (
-                          <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-md">
-                            <span className="text-blue-800 text-sm">
-                              Contact information will be available after you accept this bid
-                            </span>
-                          </div>
-                        )}
+                        {user._id === product.seller._id &&
+                          bid.status === "pending" && (
+                            <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-md">
+                              <span className="text-blue-800 text-sm">
+                                Contact information will be available after you
+                                accept this bid
+                              </span>
+                            </div>
+                          )}
                         <div className="flex justify-between mt-2">
                           <span className="font-semibold">Status:</span>
                           <span

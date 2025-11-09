@@ -151,7 +151,7 @@ router.put("/respond-to-bid/:bidId", authMiddleware, async (req, res) => {
     if (action === "accept") {
       const User = require("../models/usermodel");
       const adminUsers = await User.find({ role: "admin" });
-      
+
       for (const admin of adminUsers) {
         const adminNotification = new Notification({
           user: admin._id,
