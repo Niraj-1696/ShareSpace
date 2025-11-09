@@ -137,7 +137,7 @@ router.put("/respond-to-bid/:bidId", authMiddleware, async (req, res) => {
             message ? ` Seller's message: ${message}` : ""
           }`;
 
-    const newNotification = new Notification({
+    const buyerNotification = new Notification({
       user: bid.buyer._id,
       title: notificationTitle,
       message: notificationMessage,
@@ -145,7 +145,24 @@ router.put("/respond-to-bid/:bidId", authMiddleware, async (req, res) => {
       read: false,
     });
 
-    await newNotification.save();
+    await buyerNotification.save();
+
+    // Send notification to admin when bid is accepted
+    if (action === "accept") {
+      const User = require("../models/usermodel");
+      const adminUsers = await User.find({ role: "admin" });
+      
+      for (const admin of adminUsers) {
+        const adminNotification = new Notification({
+          user: admin._id,
+          title: "Bid Accepted - Transaction Alert",
+          message: `A bid of ₹${bid.bidAmount} for "${bid.product.name}" has been accepted. Buyer: ${bid.buyer.name}, Seller: ${bid.seller.name}`,
+          onClick: `/product/${bid.product._id}`,
+          read: false,
+        });
+        await adminNotification.save();
+      }
+    }
 
     res.send({
       success: true,

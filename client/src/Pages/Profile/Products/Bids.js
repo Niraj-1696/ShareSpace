@@ -94,12 +94,26 @@ function Bids({ showBidModal, setShowBidModal, product }) {
       title: "Contact Details",
       dataIndex: "contactDetails",
       render: (text, record) => {
-        return (
-          <div className="text-sm">
-            <p>Email: {record.buyer?.email}</p>
-            <p>Mobile: {record.mobile}</p>
-          </div>
-        );
+        if (record.status === "accepted") {
+          return (
+            <div className="text-sm">
+              <p>Email: {record.buyer?.email}</p>
+              <p>Mobile: {record.mobile}</p>
+            </div>
+          );
+        } else if (record.status === "pending") {
+          return (
+            <div className="text-sm text-blue-600">
+              <p>Available after acceptance</p>
+            </div>
+          );
+        } else {
+          return (
+            <div className="text-sm text-gray-500">
+              <p>Not available</p>
+            </div>
+          );
+        }
       },
     },
     {
