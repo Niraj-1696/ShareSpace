@@ -96,8 +96,8 @@ function Bids({ showBidModal, setShowBidModal, product }) {
       render: (text, record) => {
         return (
           <div className="text-sm">
-            <p>📧 {record.buyer?.email}</p>
-            <p>📱 {record.mobile}</p>
+            <p>Email: {record.buyer?.email}</p>
+            <p>Mobile: {record.mobile}</p>
           </div>
         );
       },
@@ -115,14 +115,14 @@ function Bids({ showBidModal, setShowBidModal, product }) {
                 className="bg-green-600 hover:bg-green-700"
                 onClick={() => handleBidResponse(record._id, "accept")}
               >
-                ✅ Accept
+                Accept
               </Button>
               <Button
                 danger
                 size="small"
                 onClick={() => handleBidResponse(record._id, "reject")}
               >
-                ❌ Reject
+                Reject
               </Button>
             </div>
           );
@@ -133,7 +133,7 @@ function Bids({ showBidModal, setShowBidModal, product }) {
               record.status === "accepted" ? "text-green-600" : "text-red-600"
             }`}
           >
-            {record.status === "accepted" ? "✅ Accepted" : "❌ Rejected"}
+            {record.status === "accepted" ? "Accepted" : "Rejected"}
           </span>
         );
       },

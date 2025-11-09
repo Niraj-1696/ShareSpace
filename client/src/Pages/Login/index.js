@@ -12,7 +12,7 @@ const rules = [
 ];
 
 function Login() {
-  const { message } = AntdApp.useApp(); // ✅ Correct now
+  const { message } = AntdApp.useApp(); // Correct now
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const onFinish = async (values) => {

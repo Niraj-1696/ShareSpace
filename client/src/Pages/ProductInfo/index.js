@@ -176,14 +176,13 @@ function ProductInfo() {
               {product.bids?.some((bid) => bid.status === "accepted") && (
                 <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md">
                   <span className="text-green-800 text-sm font-medium">
-                    🎉 Bidding Closed - A bid has been accepted for this product
+                    Bidding Closed - A bid has been accepted for this product
                   </span>
                 </div>
               )}
 
-              {/* Only show the bids list when seller enables it */}
-              {product.showBidsOnProductPage !== false && (
-                <div className="flex flex-col gap-3 mt-3">
+              {/* Always show the bids list */}
+              <div className="flex flex-col gap-3 mt-3">
                   {product.bids && product.bids.length > 0 ? (
                     product.bids.map((bid) => {
                       return (
@@ -202,7 +201,7 @@ function ProductInfo() {
                           {user._id === product.seller._id && (
                             <div className="flex justify-between mt-2">
                               <span className="font-semibold">Mobile:</span>
-                              <span className="text-sm">📱 {bid.mobile}</span>
+                              <span className="text-sm">Mobile: {bid.mobile}</span>
                             </div>
                           )}
                           {user._id === product.seller._id && (
@@ -228,13 +227,9 @@ function ProductInfo() {
                             </span>
                           </div>
                           <div className="flex justify-between mt-2">
-                            <span className="font-semibold">
-                              Bid Placed On:
-                            </span>
-                            <span>
-                              {moment(bid.createdAt).format(
-                                "MMM Do YYYY, h:mm a"
-                              )}
+                            <span className="font-semibold">Bid Placed:</span>
+                            <span className="text-sm text-blue-600 font-medium">
+                              {moment(bid.createdAt).format("MMM Do YYYY, h:mm a")}
                             </span>
                           </div>
 
@@ -250,7 +245,7 @@ function ProductInfo() {
                                     handleBidResponse(bid._id, "accept")
                                   }
                                 >
-                                  ✅ Accept
+                                  Accept
                                 </Button>
                                 <Button
                                   danger
@@ -259,7 +254,7 @@ function ProductInfo() {
                                     handleBidResponse(bid._id, "reject")
                                   }
                                 >
-                                  ❌ Reject
+                                  Reject
                                 </Button>
                               </div>
                             )}
@@ -272,7 +267,6 @@ function ProductInfo() {
                     </div>
                   )}
                 </div>
-              )}
             </div>
           </div>
         </div>

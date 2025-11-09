@@ -111,7 +111,7 @@ router.post("/register", upload.single("collegeIdImage"), async (req, res) => {
     });
   }
 });
-// ✅ User login
+// User login
 router.post("/login", async (req, res) => {
   try {
     // Check if user exists
@@ -139,7 +139,7 @@ router.post("/login", async (req, res) => {
     const validPassword = await bcrypt.compare(
       req.body.password,
       user.password
-    ); // ✅ Fix typo from `bscrypt.compared`
+    ); // Fix typo from `bscrypt.compared`
 
     if (!validPassword) {
       throw new Error("Invalid password");
@@ -453,7 +453,7 @@ router.delete("/delete-user/:id", authMiddleware, async (req, res) => {
     await User.findByIdAndDelete(req.params.id);
 
     console.log(
-      `👤 User deleted by admin: ${userToDelete.name} (${userToDelete.email})`
+      `User deleted by admin: ${userToDelete.name} (${userToDelete.email})`
     );
 
     res.send({
@@ -461,7 +461,7 @@ router.delete("/delete-user/:id", authMiddleware, async (req, res) => {
       message: `User "${userToDelete.name}" has been successfully deleted`,
     });
   } catch (error) {
-    console.error("❌ Error deleting user:", error);
+    console.error("Error deleting user:", error);
     res.status(500).send({
       success: false,
       message: error.message,

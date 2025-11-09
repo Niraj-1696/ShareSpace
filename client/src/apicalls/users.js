@@ -1,7 +1,7 @@
 // src/apicalls/users.js
 import { axiosInstance } from "./axiosinstance";
 
-// ✅ Correct export
+// Correct export
 export const RegisterUser = async (payload, isMultipart = false) => {
   console.log("RegisterUser called", payload); // optional debug
   const config = isMultipart

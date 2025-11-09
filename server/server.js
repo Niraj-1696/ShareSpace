@@ -7,7 +7,7 @@ require("dotenv").config();
 const dbconfig = require("./config/dbconfig");
 const port = process.env.PORT || 5000;
 
-// ✅ Proper CORS for credentials
+// Proper CORS for credentials
 app.use(
   cors({
     origin: "http://localhost:3000", // your frontend
@@ -28,5 +28,5 @@ app.use("/api/users", usersRoute);
 app.use("/api/products", productsRoute);
 
 app.listen(port, () =>
-  console.log(`✅ Server running on http://localhost:${port}`)
+  console.log(`Server running on http://localhost:${port}`)
 );

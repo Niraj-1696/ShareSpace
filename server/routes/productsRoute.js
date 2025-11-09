@@ -55,7 +55,7 @@ router.post("/add-product", authMiddleware, async (req, res) => {
       warrentyAvailable,
       accessoriesAvailable,
       boxAvailable,
-      showBidsOnProductPage,
+      showBidsOnProductPage: true, // Always show bids on product page
       status,
       seller: req.userId,
     });
@@ -68,7 +68,7 @@ router.post("/add-product", authMiddleware, async (req, res) => {
     // Send Notification to admin
     const admins = await User.find({ role: "admin" });
     console.log(
-      `📧 Found ${admins.length} admin(s) to notify about new product: ${name}`
+      `Found ${admins.length} admin(s) to notify about new product: ${name}`
     );
 
     // Create notifications for all admins
@@ -85,12 +85,12 @@ router.post("/add-product", authMiddleware, async (req, res) => {
         });
         const savedNotification = await newNotification.save();
         console.log(
-          `✅ Notification sent to admin: ${admin.name} (${admin.email})`
+          `Notification sent to admin: ${admin.name} (${admin.email})`
         );
         return savedNotification;
       } catch (notifError) {
         console.error(
-          `❌ Failed to send notification to admin ${admin.email}:`,
+          `Failed to send notification to admin ${admin.email}:`,
           notifError.message
         );
         throw notifError;
@@ -101,11 +101,11 @@ router.post("/add-product", authMiddleware, async (req, res) => {
     try {
       await Promise.all(notificationPromises);
       console.log(
-        `✅ All admin notifications sent successfully for product: ${name}`
+        `All admin notifications sent successfully for product: ${name}`
       );
     } catch (notifError) {
       console.error(
-        `❌ Error sending admin notifications:`,
+        `Error sending admin notifications:`,
         notifError.message
       );
       // Don't fail the product creation if notifications fail
@@ -116,7 +116,7 @@ router.post("/add-product", authMiddleware, async (req, res) => {
       message: "Product added successfully",
     });
   } catch (error) {
-    console.error("❌ Error adding product:", error);
+    console.error("Error adding product:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -179,7 +179,7 @@ router.post("/get-products", async (req, res) => {
 
     res.status(200).json({ success: true, data: productsWithBids });
   } catch (error) {
-    console.error("❌ Error fetching products:", error);
+    console.error("Error fetching products:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -195,7 +195,7 @@ router.get("/get-product/:id", async (req, res) => {
     }
     res.status(200).json({ success: true, data: product });
   } catch (error) {
-    console.error("❌ Error fetching product:", error);
+    console.error("Error fetching product:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -203,7 +203,9 @@ router.get("/get-product/:id", async (req, res) => {
 // Edit a product
 router.put("/edit-product/:id", authMiddleware, async (req, res) => {
   try {
-    await Product.findByIdAndUpdate(req.params.id, req.body);
+    // Ensure bids are always visible on product page
+    const updateData = { ...req.body, showBidsOnProductPage: true };
+    await Product.findByIdAndUpdate(req.params.id, updateData);
     res
       .status(200)
       .json({ success: true, message: "Product updated successfully" });
@@ -316,7 +318,7 @@ router.put("/update-product-status/:id", authMiddleware, async (req, res) => {
       product: updatedProduct,
     });
   } catch (error) {
-    console.error("❌ Error updating product status:", error);
+    console.error("Error updating product status:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 });

@@ -127,7 +127,7 @@ router.put("/respond-to-bid/:bidId", authMiddleware, async (req, res) => {
 
     // Create notification for buyer
     const notificationTitle =
-      action === "accept" ? "Bid Accepted! 🎉" : "Bid Response";
+      action === "accept" ? "Bid Accepted!" : "Bid Response";
     const notificationMessage =
       action === "accept"
         ? `Great news! Your bid of ₹${bid.bidAmount} for "${bid.product.name}" has been accepted. Contact the seller to proceed.`

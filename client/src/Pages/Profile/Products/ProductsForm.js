@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import Images from "./Images"; // ✅ make sure Images has default export
+import Images from "./Images"; // make sure Images has default export
 import {
   Modal,
   Tabs,
@@ -33,8 +33,7 @@ function ProductsForm({
   selectedProduct,
   getData,
 }) {
-  // ❌ Your previous state declaration was incorrect
-  // ✅ Correct useState syntax:
+  // Correct useState syntax:
   const [selectedTab, setSelectedTab] = React.useState("1");
 
   const dispatch = useDispatch();
@@ -112,7 +111,7 @@ function ProductsForm({
         <Tabs
           defaultActiveKey="1"
           activeKey={selectedTab}
-          onChange={(key) => setSelectedTab(key)} // ✅ correct function call
+          onChange={(key) => setSelectedTab(key)} // correct function call
           items={[
             {
               key: "1",
@@ -167,17 +166,6 @@ function ProductsForm({
                         <Checkbox>{item.Label}</Checkbox>
                       </Form.Item>
                     ))}
-                  </div>
-
-                  {/* Show bids on product page */}
-                  <div className="mt-3">
-                    <Form.Item
-                      name="showBidsOnProductPage"
-                      valuePropName="checked"
-                      initialValue={true}
-                    >
-                      <Checkbox>Show bids on product page</Checkbox>
-                    </Form.Item>
                   </div>
 
                   {/* Hidden images field for future upload */}

@@ -42,7 +42,7 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    // Controls whether to show bids section on public product page
+    // Always show bids section on public product page (no longer configurable)
     showBidsOnProductPage: {
       type: Boolean,
       default: true,

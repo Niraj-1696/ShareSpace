@@ -3,7 +3,7 @@ import { Button, message, Table } from "antd";
 import ProductsForm from "./ProductsForm";
 import { GetProducts, DeleteProduct } from "../../../apicalls/products";
 import { Setloader } from "../../../Redux/loadersSlice";
-import { useDispatch, useSelector } from "react-redux"; // ✅ added useSelector
+import { useDispatch, useSelector } from "react-redux"; // added useSelector
 import moment from "moment";
 import Bids from "./Bids";
 
@@ -15,7 +15,7 @@ function Products() {
   const { user } = useSelector((state) => state.users);
   const dispatch = useDispatch();
 
-  // ✅ Fetch products for the logged-in seller only
+  // Fetch products for the logged-in seller only
   const getData = async () => {
     try {
       dispatch(Setloader(true));
@@ -41,7 +41,7 @@ function Products() {
     }
   };
 
-  // ✅ Delete product
+  // Delete product
   const handleDeleteProduct = async (id) => {
     try {
       dispatch(Setloader(true));
@@ -59,7 +59,7 @@ function Products() {
     }
   };
 
-  // ✅ Table columns
+  // Table columns
   const columns = [
     {
       title: "Product",
@@ -122,7 +122,7 @@ function Products() {
     },
   ];
 
-  // ✅ Fetch data on mount
+  // Fetch data on mount
   useEffect(() => {
     if (user?._id) {
       getData();

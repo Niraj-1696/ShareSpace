@@ -7,4 +7,4 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
-module.exports = cloudinary; // ✅ use module.exports in CommonJS
+module.exports = cloudinary; // use module.exports in CommonJS

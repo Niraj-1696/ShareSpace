@@ -110,14 +110,14 @@ function UserBids() {
           </span>
           {record.status === "accepted" && (
             <div className="text-xs">
-              <div className="font-medium text-green-600">✅ Accepted!</div>
+              <div className="font-medium text-green-600">Accepted!</div>
               <div className="text-gray-600">
-                <div>📧 Contact: {record.seller?.email}</div>
+                <div>Contact: {record.seller?.email}</div>
               </div>
             </div>
           )}
           {record.status === "rejected" && (
-            <div className="text-xs text-red-600 font-medium">❌ Rejected</div>
+            <div className="text-xs text-red-600 font-medium">Rejected</div>
           )}
         </div>
       ),

@@ -10,7 +10,7 @@ function Products() {
 
   const dispatch = useDispatch();
 
-  // ✅ Fetch products for the logged-in seller only
+  // Fetch products for the logged-in seller only
   const getData = async () => {
     try {
       dispatch(Setloader(true));
@@ -53,7 +53,7 @@ function Products() {
     }
   };
 
-  // ✅ Table columns
+  // Table columns
   const columns = [
     {
       title: "Product",
@@ -143,7 +143,7 @@ function Products() {
     },
   ];
 
-  // ✅ Fetch data on mount
+  // Fetch data on mount
   useEffect(() => {
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps

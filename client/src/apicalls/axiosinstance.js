@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000", // ✅ must include http://
+  baseURL: "http://localhost:5000", // must include http://
 });
 
 axiosInstance.interceptors.request.use((config) => {

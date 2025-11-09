@@ -80,7 +80,7 @@ function Users() {
     setSelectedUser(null);
   };
 
-  // ✅ Table columns
+  // Table columns
   const columns = [
     { title: "Name", dataIndex: "name" },
     { title: "Email", dataIndex: "email" },
@@ -184,7 +184,7 @@ function Users() {
     },
   ];
 
-  // ✅ Fetch data on mount
+  // Fetch data on mount
   useEffect(() => {
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
