@@ -8,8 +8,6 @@ mongoose
     socketTimeoutMS: 45000,
   })
   .then(() => console.log("MongoDB Connected Successfully"))
-  .catch((error) =>
-    console.error("MongoDB Connection Failed:", error.message)
-  );
+  .catch((error) => console.error("MongoDB Connection Failed:", error.message));
 
 module.exports = mongoose.connection;

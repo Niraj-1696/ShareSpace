@@ -183,90 +183,94 @@ function ProductInfo() {
 
               {/* Always show the bids list */}
               <div className="flex flex-col gap-3 mt-3">
-                  {product.bids && product.bids.length > 0 ? (
-                    product.bids.map((bid) => {
-                      return (
-                        <div
-                          key={bid._id}
-                          className="border border-gray-400 border-solid p-3 rounded"
-                        >
-                          <div className="flex justify-between">
-                            <span className="font-semibold">Name:</span>
-                            <span>{bid.buyer?.name || "N/A"}</span>
-                          </div>
-                          <div className="flex justify-between mt-2">
-                            <span className="font-semibold">Bid Amount:</span>
-                            <span>₹ {bid.bidAmount}</span>
-                          </div>
-                          {user._id === product.seller._id && (
-                            <div className="flex justify-between mt-2">
-                              <span className="font-semibold">Mobile:</span>
-                              <span className="text-sm">Mobile: {bid.mobile}</span>
-                            </div>
-                          )}
-                          {user._id === product.seller._id && (
-                            <div className="flex justify-between mt-2">
-                              <span className="font-semibold">Message:</span>
-                              <span className="text-sm">
-                                {bid.message || "No message provided"}
-                              </span>
-                            </div>
-                          )}
-                          <div className="flex justify-between mt-2">
-                            <span className="font-semibold">Status:</span>
-                            <span
-                              className={`px-2 py-1 rounded text-xs font-medium ${
-                                bid.status === "pending"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : bid.status === "accepted"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-100 text-red-800"
-                              }`}
-                            >
-                              {bid.status?.toUpperCase() || "PENDING"}
-                            </span>
-                          </div>
-                          <div className="flex justify-between mt-2">
-                            <span className="font-semibold">Bid Placed:</span>
-                            <span className="text-sm text-blue-600 font-medium">
-                              {moment(bid.createdAt).format("MMM Do YYYY, h:mm a")}
-                            </span>
-                          </div>
-
-                          {/* Accept/Reject buttons for seller when bid is pending */}
-                          {user._id === product.seller._id &&
-                            bid.status === "pending" && (
-                              <div className="flex gap-2 mt-3">
-                                <Button
-                                  type="primary"
-                                  size="small"
-                                  className="bg-green-600 hover:bg-green-700"
-                                  onClick={() =>
-                                    handleBidResponse(bid._id, "accept")
-                                  }
-                                >
-                                  Accept
-                                </Button>
-                                <Button
-                                  danger
-                                  size="small"
-                                  onClick={() =>
-                                    handleBidResponse(bid._id, "reject")
-                                  }
-                                >
-                                  Reject
-                                </Button>
-                              </div>
-                            )}
+                {product.bids && product.bids.length > 0 ? (
+                  product.bids.map((bid) => {
+                    return (
+                      <div
+                        key={bid._id}
+                        className="border border-gray-400 border-solid p-3 rounded"
+                      >
+                        <div className="flex justify-between">
+                          <span className="font-semibold">Name:</span>
+                          <span>{bid.buyer?.name || "N/A"}</span>
                         </div>
-                      );
-                    })
-                  ) : (
-                    <div className="text-gray-500 text-center p-4">
-                      No bids yet
-                    </div>
-                  )}
-                </div>
+                        <div className="flex justify-between mt-2">
+                          <span className="font-semibold">Bid Amount:</span>
+                          <span>₹ {bid.bidAmount}</span>
+                        </div>
+                        {user._id === product.seller._id && (
+                          <div className="flex justify-between mt-2">
+                            <span className="font-semibold">Mobile:</span>
+                            <span className="text-sm">
+                              Mobile: {bid.mobile}
+                            </span>
+                          </div>
+                        )}
+                        {user._id === product.seller._id && (
+                          <div className="flex justify-between mt-2">
+                            <span className="font-semibold">Message:</span>
+                            <span className="text-sm">
+                              {bid.message || "No message provided"}
+                            </span>
+                          </div>
+                        )}
+                        <div className="flex justify-between mt-2">
+                          <span className="font-semibold">Status:</span>
+                          <span
+                            className={`px-2 py-1 rounded text-xs font-medium ${
+                              bid.status === "pending"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : bid.status === "accepted"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
+                            }`}
+                          >
+                            {bid.status?.toUpperCase() || "PENDING"}
+                          </span>
+                        </div>
+                        <div className="flex justify-between mt-2">
+                          <span className="font-semibold">Bid Placed:</span>
+                          <span className="text-sm text-blue-600 font-medium">
+                            {moment(bid.createdAt).format(
+                              "MMM Do YYYY, h:mm a"
+                            )}
+                          </span>
+                        </div>
+
+                        {/* Accept/Reject buttons for seller when bid is pending */}
+                        {user._id === product.seller._id &&
+                          bid.status === "pending" && (
+                            <div className="flex gap-2 mt-3">
+                              <Button
+                                type="primary"
+                                size="small"
+                                className="bg-green-600 hover:bg-green-700"
+                                onClick={() =>
+                                  handleBidResponse(bid._id, "accept")
+                                }
+                              >
+                                Accept
+                              </Button>
+                              <Button
+                                danger
+                                size="small"
+                                onClick={() =>
+                                  handleBidResponse(bid._id, "reject")
+                                }
+                              >
+                                Reject
+                              </Button>
+                            </div>
+                          )}
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="text-gray-500 text-center p-4">
+                    No bids yet
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

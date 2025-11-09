@@ -104,10 +104,7 @@ router.post("/add-product", authMiddleware, async (req, res) => {
         `All admin notifications sent successfully for product: ${name}`
       );
     } catch (notifError) {
-      console.error(
-        `Error sending admin notifications:`,
-        notifError.message
-      );
+      console.error(`Error sending admin notifications:`, notifError.message);
       // Don't fail the product creation if notifications fail
     }
 
