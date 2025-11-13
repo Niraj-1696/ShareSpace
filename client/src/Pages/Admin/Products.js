@@ -1,6 +1,10 @@
 import React, { useEffect } from "react";
-import { message, Table } from "antd";
-import { GetProducts, UpdateProductStatus } from "../../apicalls/products";
+import { message, Table, Popconfirm } from "antd";
+import {
+  GetProducts,
+  UpdateProductStatus,
+  DeleteProduct,
+} from "../../apicalls/products";
 import { Setloader } from "../../Redux/loadersSlice";
 import { useDispatch } from "react-redux";
 import moment from "moment";
@@ -53,6 +57,23 @@ function Products() {
     }
   };
 
+  const onDeleteProduct = async (id, productName) => {
+    try {
+      dispatch(Setloader(true));
+      const response = await DeleteProduct(id);
+      dispatch(Setloader(false));
+      if (response.success) {
+        message.success(response.message);
+        getData(); // Refresh the product list
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      dispatch(Setloader(false));
+      message.error(error.message);
+    }
+  };
+
   // Table columns
   const columns = [
     {
@@ -71,7 +92,10 @@ function Products() {
       title: "Seller",
       dataIndex: "name",
       render: (text, record) => {
-        return record.seller.name;
+        if (!record.seller) return "N/A";
+        return `${record.seller.name || "N/A"} (${
+          record.seller.class || "N/A"
+        })`;
       },
     },
     { title: "Price", dataIndex: "price" },
@@ -112,6 +136,20 @@ function Products() {
               >
                 Reject
               </span>
+            )}
+            {status === "rejected" && (
+              <Popconfirm
+                title={`Delete Product: ${record.name}`}
+                description={`Are you sure you want to permanently delete "${record.name}"? This action cannot be undone.`}
+                onConfirm={() => onDeleteProduct(_id, record.name)}
+                okText="Yes, Delete"
+                cancelText="Cancel"
+                okType="danger"
+              >
+                <span className="underline cursor-pointer text-red-600 hover:text-red-800">
+                  Delete
+                </span>
+              </Popconfirm>
             )}
             {status === "approved" && (
               <span

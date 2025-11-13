@@ -82,8 +82,20 @@ function Users() {
 
   // Table columns
   const columns = [
-    { title: "Name", dataIndex: "name" },
-    { title: "Email", dataIndex: "email" },
+    {
+      title: "Name",
+      dataIndex: "name",
+      render: (text, record) => {
+        return record.name || "N/A";
+      },
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      render: (text, record) => {
+        return record.email || "N/A";
+      },
+    },
     {
       title: "PSID",
       dataIndex: "psid",
@@ -96,6 +108,13 @@ function Users() {
       dataIndex: "rollNo",
       render: (text, record) => {
         return record.rollNo || "N/A";
+      },
+    },
+    {
+      title: "Class",
+      dataIndex: "class",
+      render: (text, record) => {
+        return record.class || "N/A";
       },
     },
     {
@@ -122,7 +141,9 @@ function Users() {
       title: "Action",
       dataIndex: "action",
       render: (text, record) => {
+        if (!record) return null;
         const { status, _id, role, name } = record;
+        if (!_id) return null;
         return (
           <div className="flex gap-3 flex-wrap">
             {status === "pending" && (
@@ -244,6 +265,9 @@ function Users() {
               </p>
               <p>
                 <strong>Roll No:</strong> {selectedUser.rollNo}
+              </p>
+              <p>
+                <strong>Class:</strong> {selectedUser.class || "N/A"}
               </p>
               <p>
                 <strong>Status:</strong> {selectedUser.status?.toUpperCase()}

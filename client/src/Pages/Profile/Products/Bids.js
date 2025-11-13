@@ -47,9 +47,12 @@ function Bids({ showBidModal, setShowBidModal, product }) {
 
   const columns = [
     {
-      title: "Name",
+      title: "Buyer",
       dataIndex: "name",
-      render: (text, record) => record.buyer?.name || "N/A",
+      render: (text, record) =>
+        record.buyer?.name
+          ? `${record.buyer.name} (${record.buyer.class || "N/A"})`
+          : "N/A",
     },
     {
       title: "Bid Amount",

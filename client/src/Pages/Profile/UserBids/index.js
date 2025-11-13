@@ -52,7 +52,11 @@ function UserBids() {
       dataIndex: "seller",
       render: (text, record) => (
         <div>
-          <p>{record.seller?.name}</p>
+          <p>
+            {record.seller?.name
+              ? `${record.seller.name} (${record.seller.class || "N/A"})`
+              : "N/A"}
+          </p>
         </div>
       ),
     },

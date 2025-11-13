@@ -145,8 +145,14 @@ function ProductInfo() {
                 Seller Details
               </h1>
               <div className="flex justify-between mt-2">
-                <span>Name</span>
-                <span>{product.seller.name}</span>
+                <span>Seller</span>
+                <span>
+                  {product.seller?.name
+                    ? `${product.seller.name} (${
+                        product.seller.class || "N/A"
+                      })`
+                    : "N/A"}
+                </span>
               </div>
             </div>
             <Divider />
@@ -191,8 +197,14 @@ function ProductInfo() {
                         className="border border-gray-400 border-solid p-3 rounded"
                       >
                         <div className="flex justify-between">
-                          <span className="font-semibold">Name:</span>
-                          <span>{bid.buyer?.name || "N/A"}</span>
+                          <span className="font-semibold">Buyer:</span>
+                          <span>
+                            {bid.buyer?.name
+                              ? `${bid.buyer.name} (${
+                                  bid.buyer.class || "N/A"
+                                })`
+                              : "N/A"}
+                          </span>
                         </div>
                         <div className="flex justify-between mt-2">
                           <span className="font-semibold">Bid Amount:</span>

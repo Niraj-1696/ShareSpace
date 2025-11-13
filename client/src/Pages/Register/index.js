@@ -70,6 +70,10 @@ function Register() {
       message.error("Please enter your Roll No.");
       return;
     }
+    if (!values.class) {
+      message.error("Please enter your Class.");
+      return;
+    }
     try {
       dispatch(Setloader(true));
       const formData = new FormData();
@@ -77,6 +81,7 @@ function Register() {
       formData.append("email", values.email);
       formData.append("password", values.password);
       formData.append("rollNo", values.rollNo);
+      formData.append("class", values.class);
       formData.append("collegeIdImage", imageFile);
       // PSID will be extracted server-side as well for validation
       const response = await RegisterUser(formData, true); // true: multipart
@@ -165,6 +170,13 @@ function Register() {
           </Form.Item>
           <Form.Item label="Roll No" name="rollNo" rules={rules}>
             <Input placeholder="Enter your Roll No" className="rounded-lg" />
+          </Form.Item>
+          <Form.Item label="Class" name="class" rules={rules}>
+            <Input
+              placeholder="Enter your Class (e.g., FYIT, SYCS)"
+              className="rounded-lg"
+              key="class-input-field"
+            />
           </Form.Item>
           <Button
             type="primary"

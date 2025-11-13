@@ -40,6 +40,9 @@ function Profile() {
               Email: <b>{user.email}</b>
             </span>
             <span>
+              Class: <b>{user.class}</b>
+            </span>
+            <span>
               Created At:{" "}
               <b>{moment(user.createdAt).format("MMM Do YYYY, h:mm a")}</b>
             </span>

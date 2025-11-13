@@ -19,11 +19,16 @@ const upload = multer({ storage });
 router.post("/register", upload.single("collegeIdImage"), async (req, res) => {
   try {
     // Check for duplicate email, psid, rollNo
-    const { name, email, password, rollNo } = req.body;
+    const { name, email, password, rollNo, class: userClass } = req.body;
 
     // Validate rollNo input
     if (!rollNo || !rollNo.trim()) {
       throw new Error("Roll No is required");
+    }
+
+    // Validate class input
+    if (!userClass || !userClass.trim()) {
+      throw new Error("Class is required");
     }
 
     // Image file
@@ -73,6 +78,7 @@ router.post("/register", upload.single("collegeIdImage"), async (req, res) => {
       password: hashedPassword,
       psid,
       rollNo: rollNo.trim(),
+      class: userClass.trim(),
       collegeIdImage: uploadResult.secure_url,
       status: "pending",
     });
@@ -85,7 +91,7 @@ router.post("/register", upload.single("collegeIdImage"), async (req, res) => {
       const notificationPromises = adminUsers.map((admin) => {
         const notification = new Notification({
           title: "New User Registration",
-          message: `${name} (PSID: ${psid}, Roll No: ${rollNo.trim()}) has registered and is awaiting approval.`,
+          message: `${name} (PSID: ${psid}, Roll No: ${rollNo.trim()}, Class: ${userClass.trim()}) has registered and is awaiting approval.`,
           onClick: "/admin",
           user: admin._id,
           read: false,
@@ -334,6 +340,8 @@ router.get("/get-current-user", authMiddleware, async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        class: user.class,
+        createdAt: user.createdAt,
       },
     });
   } catch (error) {
