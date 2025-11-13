@@ -1,0 +1,244 @@
+@startuml UC1_Student_Registration
+title UC1: Student Registration
+left to right direction
+skinparam packageStyle rectangle
+
+actor "New Student" as NewStudent
+
+rectangle "ShareSpace Registration System" {
+  usecase "UC1: Student Registration" as UC1
+  usecase "OCR PSID Extraction" as OCR
+  usecase "Secure Image Upload" as Upload  
+  usecase "Email Validation" as Validation
+  usecase "Admin Notification" as AdminNotify
+}
+
+NewStudent --> UC1
+
+UC1 .> OCR : <<include>>
+UC1 .> Upload : <<include>>
+UC1 .> Validation : <<include>>
+UC1 .> AdminNotify : <<include>>
+
+note right of UC1 : Preconditions:\n- Internet access available\n- Registration page accessible\n- Valid college email\n- Clear college ID image
+
+note bottom of UC1 : Postconditions:\n- Student account created with extracted PSID/Roll Number\n- Account marked as "pending" for admin approval\n- User notified of verification status
+@enduml
+
+@startuml UC2_Admin_Account_Verification
+title UC2: Admin Account Verification
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Platform Admin" as Admin
+
+rectangle "ShareSpace Admin System" {
+  usecase "UC2: Admin Account Verification" as UC2
+  usecase "Review ID Image" as ReviewID
+  usecase "Verify OCR Data" as VerifyOCR
+  usecase "Update Account Status" as UpdateStatus
+  usecase "Notify User" as NotifyUser
+}
+
+Admin --> UC2
+
+UC2 .> ReviewID : <<include>>
+UC2 .> VerifyOCR : <<include>>
+UC2 .> UpdateStatus : <<include>>
+UC2 .> NotifyUser : <<include>>
+
+note right of UC2 : Preconditions:\n- Admin logged in with verification rights\n- Pending student registrations available
+
+note bottom of UC2 : Postconditions:\n- Account status updated (active/blocked)\n- Student notified of decision\n- Approved students gain marketplace access
+@enduml
+
+@startuml UC3_Student_Login
+title UC3: Student Login
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Student/Admin" as Student
+
+rectangle "ShareSpace Auth System" {
+  usecase "UC3: Student Login" as UC3
+  usecase "Validate Credentials" as ValidateCredentials
+  usecase "Generate JWT Token" as GenerateJWT
+  usecase "Role-based Routing" as RoleRouting
+}
+
+Student --> UC3
+
+UC3 .> ValidateCredentials : <<include>>
+UC3 .> GenerateJWT : <<include>>
+UC3 .> RoleRouting : <<include>>
+
+note right of UC3 : Preconditions:\n- Account exists and verified by admin\n- Login page accessible
+
+note bottom of UC3 : Postconditions:\n- JWT token generated and stored\n- User redirected to appropriate dashboard\n- Session established
+@enduml
+
+@startuml UC4_Password_Recovery
+title UC4: Password Recovery
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Student/Admin" as User
+
+rectangle "ShareSpace Password Recovery" {
+  usecase "UC4: Password Recovery" as UC4
+  usecase "Generate Reset Token" as GenerateToken
+  usecase "Send Reset Email" as SendEmail
+  usecase "Validate Token" as ValidateToken
+  usecase "Update Password" as UpdatePassword
+}
+
+User --> UC4
+
+UC4 .> GenerateToken : <<include>>
+UC4 .> SendEmail : <<include>>
+UC4 .> ValidateToken : <<include>>
+UC4 .> UpdatePassword : <<include>>
+
+note right of UC4 : Preconditions:\n- Registered account with valid email
+
+note bottom of UC4 : Postconditions:\n- Password updated\n- User can login with new password
+@enduml
+
+@startuml UC5_Browse_Products
+title UC5: Browse Products
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Student (Buyer)" as Buyer
+
+rectangle "ShareSpace Product System" {
+  usecase "UC5: Browse Products" as UC5
+  usecase "Load Product Grid" as LoadProducts
+  usecase "Apply Filters" as ApplyFilters
+  usecase "Sort Products" as SortProducts
+  usecase "Handle Pagination" as ViewPagination
+}
+
+Buyer --> UC5
+
+UC5 .> LoadProducts : <<include>>
+UC5 .> ApplyFilters : <<include>>
+UC5 .> SortProducts : <<include>>
+UC5 .> ViewPagination : <<include>>
+
+note right of UC5 : Preconditions:\n- Logged-in verified student\n- Approved products available
+
+note bottom of UC5 : Postconditions:\n- Product grid displayed\n- Filters applied successfully
+@enduml
+
+@startuml UC6_Search_Products
+title UC6: Search Products
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Student (Buyer)" as Buyer
+
+rectangle "ShareSpace Search System" {
+  usecase "UC6: Search Products" as UC6
+  usecase "Real-time Search" as RealTimeSearch
+  usecase "Provide Autocomplete" as Autocomplete
+  usecase "Handle Typos/Suggestions" as HandleTypos
+  usecase "Paginate Results" as Pagination
+}
+
+Buyer --> UC6
+
+UC6 .> RealTimeSearch : <<include>>
+UC6 .> Autocomplete : <<include>>
+UC6 ..> HandleTypos : <<extend>>
+UC6 ..> Pagination : <<extend>>
+
+note right of UC6 : Preconditions:\n- User logged in\n- Search interface accessible
+
+note bottom of UC6 : Postconditions:\n- Search results displayed\n- User can apply filters or view product details
+@enduml
+
+@startuml UC7_View_Product_Details
+title UC7: View Product Details
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Student (Buyer)" as Buyer
+
+rectangle "ShareSpace Product Detail System" {
+  usecase "UC7: View Product Details" as UC7
+  usecase "Load Product Info" as LoadDetails
+  usecase "Display Image Gallery" as ViewImages
+  usecase "Show Bid Information" as ShowBidInfo
+  usecase "Display Seller Info" as SellerInfo
+  usecase "Provide Bid Interface" as BidInterface
+}
+
+Buyer --> UC7
+
+UC7 .> LoadDetails : <<include>>
+UC7 .> ViewImages : <<include>>
+UC7 .> ShowBidInfo : <<include>>
+UC7 .> SellerInfo : <<include>>
+UC7 ..> BidInterface : <<extend>>
+
+note right of UC7 : Preconditions:\n- Product approved and available
+
+note bottom of UC7 : Postconditions:\n- User can make bidding decisions\n- All product information displayed
+@enduml
+
+@startuml UC8_Place_Competitive_Bid
+title UC8: Place Competitive Bid
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Student (Buyer)" as Buyer
+
+rectangle "ShareSpace Bidding System" {
+  usecase "UC8: Place Competitive Bid" as UC8
+  usecase "Validate Bid Data" as ValidateBid
+  usecase "Check Duplicate Bids" as CheckDuplicate
+  usecase "Save Bid to Database" as SaveBid
+  usecase "Notify Seller" as NotifySeller
+  usecase "Send Bid Confirmation" as SendConfirmation
+}
+
+Buyer --> UC8
+
+UC8 .> ValidateBid : <<include>>
+UC8 .> CheckDuplicate : <<include>>
+UC8 .> SaveBid : <<include>>
+UC8 .> NotifySeller : <<include>>
+UC8 .> SendConfirmation : <<include>>
+
+note right of UC8 : Preconditions:\n- Verified student\n- Product available\n- No existing bid\n- Bidding open
+
+note bottom of UC8 : Postconditions:\n- Bid saved as pending\n- Seller notified of new bid
+@enduml
+
+@startuml UC9_Track_Bid_Status
+title UC9: Track Bid Status
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Student (Buyer)" as Buyer
+
+rectangle "ShareSpace Bid Tracking" {
+  usecase "UC9: Track Bid Status" as UC9
+  usecase "Load User's Bids" as LoadUserBids
+  usecase "Display Status Badges" as ShowStatusBadges
+  usecase "Real-time Status Updates" as RealTimeUpdates
+  usecase "Navigate to Product" as ProductNavigation
+}
+
+Buyer --> UC9
+
+UC9 .> LoadUserBids : <<include>>
+UC9 .> ShowStatusBadges : <<include>>
+UC9 .> RealTimeUpdates : <<include>>
+UC9 .> ProductNavigation : <<include>>
+
+note right of UC9 : Preconditions:\n- Logged in user\n- Placed bids exist
+
+note bottom of UC9 : Postconditions:\n- Status updated in real-time\n- User can navigate to products
+@enduml
